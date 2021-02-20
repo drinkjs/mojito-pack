@@ -1,2 +1,3 @@
-# mojito-compack
-mojito组件开发骨架
+# screen-libpack
+
+组件开发骨架

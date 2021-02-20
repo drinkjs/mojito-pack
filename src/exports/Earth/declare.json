@@ -1,0 +1,12 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "barData": {
+      "type": "array",
+      "comment": "[{ lat: number; lng: number; value: number },...]",
+      "default": []
+    }
+  },
+  "title": "地球",
+  "libName": "Earth"
+}

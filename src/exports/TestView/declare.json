@@ -1,0 +1,11 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "label": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "title": "组件测试",
+  "libName": "TestView"
+}

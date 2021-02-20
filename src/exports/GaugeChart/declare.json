@@ -1,0 +1,27 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "data": {
+      "type": [],
+      "comment": "图表数据[{name:类型1, value:100}, ...]",
+      "default": [
+        {
+          "value": 58,
+          "name": "完成率"
+        }
+      ]
+    },
+    "option": {
+      "type": {},
+      "comment": "echarts配置，具体参考echarts官网",
+      "default": {}
+    }
+  },
+  "events": {
+    "onCreated": {
+      "comment": "图表初始化完成事件(echart)=>void"
+    }
+  },
+  "title": "基础仪表盘",
+  "libName": "GaugeChart"
+}

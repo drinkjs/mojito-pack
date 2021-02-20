@@ -1,0 +1,53 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "data": {
+      "type": [],
+      "comment": "图表数据[{name:类型1, value:100, max:500}, ...]",
+      "default": [
+        {
+          "name": "销售",
+          "max": 6500,
+          "value": 4300
+        },
+        {
+          "name": "管理",
+          "max": 16000,
+          "value": 10000
+        },
+        {
+          "name": "信息技术",
+          "max": 30000,
+          "value": 28000
+        },
+        {
+          "name": "客服",
+          "max": 38000,
+          "value": 35000
+        },
+        {
+          "name": "研发",
+          "max": 52000,
+          "value": 50000
+        },
+        {
+          "name": "市场",
+          "max": 25000,
+          "value": 19000
+        }
+      ]
+    },
+    "option": {
+      "type": {},
+      "comment": "echarts配置，具体参考echarts官网",
+      "default": {}
+    }
+  },
+  "events": {
+    "onCreated": {
+      "comment": "图表初始化完成事件(echart)=>void"
+    }
+  },
+  "title": "基础雷达图",
+  "libName": "RadarChart"
+}
