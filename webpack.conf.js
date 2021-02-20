@@ -5,8 +5,6 @@ const ROOT_PATH = path.resolve(process.cwd());
 const APP_PATH = `${ROOT_PATH}/src`;
 const rules = require("./webpack.rules");
 
-const publicPath = "/";
-
 module.exports = function(webpackConf) {
   const conf = {
     mode: "production",
@@ -45,20 +43,6 @@ module.exports = function(webpackConf) {
           ],
           exclude: /node_modules/,
         },
-        // {
-        //   test: /\.(png|jpg|gif|jpeg)$/,
-        //   use: [
-        //     {
-        //       loader: "url-loader",
-        //       options: {
-        //         limit: 8192,
-        //         publicPath: `/libs/${declare.libName}/${declare.version}/resources/`,
-        //         outputPath: "resources/",
-        //         name: "[name].[ext]",
-        //       },
-        //     },
-        //   ],
-        // },
         {
           test: /\.css$/,
           exclude: /node_modules/,
@@ -68,12 +52,6 @@ module.exports = function(webpackConf) {
             },
             {
               loader: "css-loader",
-              options: {
-                import: true,
-                modules: {
-                  localIdentName: "[name]_[local]__[hash:base64:5]",
-                },
-              },
             },
           ],
         },
