@@ -12,6 +12,8 @@ const APP_PATH = `${ROOT_PATH}/src`;
 const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx"];
 const declareFile = "declare.json"
 
+const buildFile = ['LinesChart'];
+
 // 扫描目录
 const files = fs.readdirSync(exportPath);
 const libs = [];
@@ -25,6 +27,7 @@ files.forEach(function (item, index) {
 // build设置
 const buildConfs = [];
 libs.forEach((libName) => {
+  if(buildFile.length > 0 && buildFile.indexOf(libName) === -1) return;
   const entryPath = `${exportPath}/${libName}`;
   let entry = "";
 

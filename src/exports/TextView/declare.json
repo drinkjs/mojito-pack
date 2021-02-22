@@ -1,0 +1,11 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "text": {
+      "type": "string",
+      "default": "请输入文本"
+    }
+  },
+  "title": "文本",
+  "libName": "TextView"
+}

@@ -3,12 +3,25 @@ import * as THREE from "three";
 import { BufferGeometryUtils } from "three/examples/jsm/utils/BufferGeometryUtils";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-const d3Interpolate = require("d3-interpolate");
+const d3Scale = require("d3-scale");
 const mapPoints = require("./mapPoints.json");
 const globeRadius = 100;
 const globeSegments = 64;
 const globeWidth = 4098 / 2;
 const globeHeight = 1968 / 2;
+
+const colors = [
+  "#ffdfe0", 
+  "#ffc0c0",
+  "#FF0000",
+  "#ee7070",
+  "#c80200", 
+  "#900000",
+  "#510000",
+  "#290000",
+]
+
+const domain = [1000, 3000, 10000, 50000, 100000, 500000, 1000000, 1000000]
 
 interface EarthProps {
   barData: { lat: number; lng: number; value: number }[];
@@ -75,8 +88,6 @@ export default class Earth extends React.PureComponent<EarthProps> {
     // 场景
     this.scene = new THREE.Scene();
     // scene.background = new THREE.Color(0xAAAAAA);
-
-    console.log(canvas.clientWidth, canvas.clientHeight);
 
     // 相机
     const fov = 45;
@@ -199,17 +210,15 @@ export default class Earth extends React.PureComponent<EarthProps> {
     const { barData } = this.props;
     if (!barData || barData.length === 0) return;
 
-    barData.sort((a, b) => {
-      return b.value - a.value;
-    });
-
-    const maxValue = barData[0].value / 10000;
-    const interpolate = d3Interpolate.interpolate("#FF0000", "#000066");
     let color;
 
+    const scale = d3Scale.scaleLinear()
+    .domain(domain)
+    .range(colors);
+
     barData.forEach(({ lat, lng, value: size }) => {
+      color = scale(size);
       size = size / 10000;
-      color = interpolate(size / maxValue);
       const pos = this.convertLatLngToSphereCoords(lat, lng, globeRadius);
 
       if (pos.x && pos.y && pos.z) {
@@ -231,16 +240,6 @@ export default class Earth extends React.PureComponent<EarthProps> {
         this.barMeshs.push(barMesh);
       }
     });
-  }
-
-  /**
-   * 生成颜色
-   * @param x
-   */
-  colorFn(x: number) {
-    var c = new THREE.Color();
-    c.setHSL(0.6 - x * 0.5, 1.0, 0.5);
-    return c;
   }
 
   // 经纬度转成球体坐标

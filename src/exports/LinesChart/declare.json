@@ -1,0 +1,17 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "data": {
+      "type": [],
+      "comment": "图表数据[{name:类型1, value:100}, ...]",
+      "default": []
+    },
+    "option": {
+      "type": {},
+      "comment": "echarts配置，具体参考echarts官网",
+      "default": {}
+    }
+  },
+  "title": "多折线图",
+  "libName": "LinesChart"
+}
