@@ -81,7 +81,7 @@ libs.forEach((libName) => {
                 loader: "url-loader",
                 options: {
                   limit: 8192,
-                  publicPath: `/libs/${declare.libName}/${declare.version}/resources/`,
+                  publicPath: `/public/libs/${declare.libName}${declare.version}/resources/`,
                   outputPath: "resources/",
                   name: "[name].[ext]",
                   esModule: false,
