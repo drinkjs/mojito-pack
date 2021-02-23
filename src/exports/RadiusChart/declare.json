@@ -2,7 +2,7 @@
   "version": "v1.0.0",
   "props": {
     "data": {
-      "type": [],
+      "type": "array",
       "comment": "图表数据[{name:类型1, value:100}, ...]",
       "default": [
         {
@@ -36,22 +36,17 @@
       ]
     },
     "option": {
-      "type": {},
+      "type": "object",
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     },
     "radius": {
-      "type": [],
+      "type": "array",
       "comment": "内外圆半径",
       "default": [
-        "70%",
-        "90%"
+        "50%",
+        "80%"
       ]
-    }
-  },
-  "events": {
-    "onCreated": {
-      "comment": "图表初始化完成事件(echart)=>void"
     }
   },
   "title": "基础环形图",

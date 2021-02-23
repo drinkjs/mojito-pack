@@ -12,7 +12,7 @@ const APP_PATH = `${ROOT_PATH}/src`;
 const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx"];
 const declareFile = "declare.json"
 
-const buildFile = ['LinesChart'];
+const buildFile = ['LinesChart', 'RadiusChart', 'Earth'];
 
 // 扫描目录
 const files = fs.readdirSync(exportPath);

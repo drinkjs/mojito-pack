@@ -44,13 +44,13 @@ const defaultData = [
 ];
 
 export default (props: Props) => {
-  const { option, data, radius=["70%","90%"], ...restProps } = props;
+  const { option, data, radius=["50%","80%"], ...restProps } = props;
   const _data = data || defaultData;
 
   const opt = {
     tooltip: {
       trigger: "item",
-      formatter: "{a} <br/>{b}: {c} ({d}%)",
+      formatter: "{b}: {c} ({d}%)",
     },
     series: [
       {
@@ -58,18 +58,14 @@ export default (props: Props) => {
         radius,
         avoidLabelOverlap: false,
         label: {
-          show: false,
-          position: "center",
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: "30",
-            fontWeight: "bold",
-          },
+          show: true,
+          position: "outer",
+          alignTo: "none",
+          bleedMargin: 5,
+          color:"#fff",
         },
         labelLine: {
-          show: false,
+          show: true,
         },
         data: _data,
       },

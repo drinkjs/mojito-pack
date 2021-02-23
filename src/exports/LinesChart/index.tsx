@@ -1,90 +1,86 @@
 import * as React from "react";
-import {merge} from 'lodash';
-import ChartBox, {ChartBoxProps} from "../../components/ChartBox";
+import { merge } from "lodash";
+import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
-  name: string;
-  value: number;
+  type: string;
+  value: number[];
+  color?: string;
 }
 
 interface Props extends ChartBoxProps {
   data: ChartData[];
+  xAxisData: string[];
 }
 
 export default (props: Props) => {
-  const { option, data, ...restProps } = props;
+  const { option, data, xAxisData, ...restProps } = props;
   const _data = data || [];
+
+  const legend: string[] = [];
+  const series:any = [];
+
+  // 图例
+  _data.forEach((v) => {
+    legend.push(v.type);
+    series.push({
+      name: v.type,
+      type: "line",
+      data: v.value,
+      smooth: true,
+      itemStyle: {
+        color: v.color,
+      },
+    });
+  });
 
   const opt = {
     title: {
-        text: '过去7天全球趋势',
-        textStyle:{
-          color:"#fff"
-        }
+      text: "过去7天全球趋势",
+      textStyle: {
+        color: "#fff",
+      },
     },
     tooltip: {
-        trigger: 'axis'
+      trigger: "axis",
     },
     legend: {
-        data: ['新增', '死亡', '康复'],
-        textStyle:{
-          color:"#fff"
-        }
+      data: legend, // ["新增", "死亡", "康复"],
+      textStyle: {
+        color: "#fff",
+      },
+      icon: "rect",
     },
     xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: ['2/15', '2/16', '2/17', '2/18', '2/19', '2/20', '2/21'],
-        axisLine:{
-          lineStyle:{
-            color:"rgba(255,255,255,0.3)"
-          }
-        }
+      type: "category",
+      boundaryGap: false,
+      data: xAxisData, // ["2/15", "2/16", "2/17", "2/18", "2/19", "2/20", "2/21"],
+      axisLine: {
+        lineStyle: {
+          color: "rgba(255,255,255,0.5)",
+        },
+      },
     },
     yAxis: {
-        type: 'value',
-        splitLine:{
-          show: false,
+      type: "value",
+      splitLine: {
+        show: false,
+      },
+      axisLabel: {
+        formatter: "{value}",
+      },
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: "rgba(255,255,255,0.5)",
         },
-        axisLabel: {
-            formatter: '{value}'
-        },
-        axisLine:{
-          lineStyle:{
-            color:"rgba(255,255,255,0.3)"
-          }
-        }
+      },
+      axisTick: {
+        show: true,
+      },
     },
-    series: [
-        {
-            name: '新增',
-            type: 'line',
-            data: [10, 11, 13, 11, 12, 12, 9],
-            smooth: true,
-            itemStyle:{
-              color:"#FF0000"
-            }
-        },
-        {
-            name: '死亡',
-            type: 'line',
-            data: [1, 2, 2, 5, 3, 2, 60],
-            smooth: true,
-            itemStyle:{
-              color:"#660000"
-            }
-        },
-        {
-          name: '康复',
-          type: 'line',
-          data: [100, 25, 20, 50, 3, 28, 60],
-          smooth: true,
-          itemStyle:{
-            color:"#ff7700"
-          }
-      }
-    ]
-};
+    series,
+  };
 
   return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} />;
 };
