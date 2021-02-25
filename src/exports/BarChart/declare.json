@@ -35,6 +35,14 @@
         }
       ]
     },
+    "linearGradient": {
+      "type": "array",
+      "comment": "渐变色",
+      "default": [
+        "#ff0000",
+        "#330000"
+      ]
+    },
     "option": {
       "type": {},
       "comment": "echarts配置，具体参考echarts官网",
