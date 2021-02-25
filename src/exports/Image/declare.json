@@ -2,7 +2,7 @@
   "version": "v1.0.0",
   "props": {
     "src": {
-      "type": "upload",
+      "type": "image",
       "default": ""
     }
   },
