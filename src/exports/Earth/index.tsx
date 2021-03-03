@@ -162,7 +162,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
     this.scene.add(this.pivot);
     // 渲染场景
     this.glRender.render(this.scene, this.camera);
-    this.pivot.rotation.y = 90;
+    this.pivot.rotation.y = 180;
     this.canvasRender();
   }
 
