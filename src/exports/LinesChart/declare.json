@@ -59,7 +59,7 @@
       ]
     },
     "option": {
-      "type": {},
+      "type": "object",
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     }

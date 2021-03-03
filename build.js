@@ -3,16 +3,16 @@ const webpackConf = require("./webpack.conf");
 const fs = require("fs");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const ZipPlugin = require('zip-webpack-plugin');
+const ZipPlugin = require("zip-webpack-plugin");
 // const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const exportPath = "./src/exports";
 const ROOT_PATH = path.resolve(process.cwd());
 const APP_PATH = `${ROOT_PATH}/src`;
 const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx"];
-const declareFile = "declare.json"
+const declareFile = "declare.json";
 
-const buildFile = ['BarChart'];
+const buildFile = ["Image"];
 
 // 扫描目录
 const files = fs.readdirSync(exportPath);
@@ -27,7 +27,7 @@ files.forEach(function (item, index) {
 // build设置
 const buildConfs = [];
 libs.forEach((libName) => {
-  if(buildFile.length > 0 && buildFile.indexOf(libName) === -1) return;
+  if (buildFile.length > 0 && buildFile.indexOf(libName) === -1) return;
   const entryPath = `${exportPath}/${libName}`;
   let entry = "";
 
@@ -43,11 +43,16 @@ libs.forEach((libName) => {
   if (!entry) return;
 
   // 描述文件
-  const declare = JSON.parse(fs.readFileSync(`${entryPath}/${declareFile}`, 'utf8'));
+  const declare = JSON.parse(
+    fs.readFileSync(`${entryPath}/${declareFile}`, "utf8")
+  );
   declare.libName = libName;
-  fs.writeFileSync(`${entryPath}/${declareFile}`, JSON.stringify(declare, null, 2));
+  fs.writeFileSync(
+    `${entryPath}/${declareFile}`,
+    JSON.stringify(declare, null, 2)
+  );
 
-  if(!declare.version){
+  if (!declare.version) {
     console.error(`${declare.libName}缺少版本号`);
     return;
   }
@@ -57,7 +62,7 @@ libs.forEach((libName) => {
       entry,
       output: {
         filename: "bundle.js",
-        library: libName+declare.version,
+        library: libName + declare.version,
         libraryTarget: "umd",
         path: path.resolve(__dirname, `dist/${libName}`),
       },
@@ -70,7 +75,7 @@ libs.forEach((libName) => {
             to: declareFile,
           },
         ]),
-        new ZipPlugin()
+        new ZipPlugin(),
       ],
       module: {
         rules: [
@@ -89,52 +94,58 @@ libs.forEach((libName) => {
               },
             ],
           },
-        ]
-      }
+        ],
+      },
     })
   );
 });
 
-function delDir(path){
+function delDir(path) {
   let files = [];
-  if(fs.existsSync(path)){
-      files = fs.readdirSync(path);
-      files.forEach((file, index) => {
-          let curPath = path + "/" + file;
-          if(fs.statSync(curPath).isDirectory()){
-              delDir(curPath); //递归删除文件夹
-          } else {
-              fs.unlinkSync(curPath); //删除文件
-          }
-      });
-      fs.rmdirSync(path);
+  if (fs.existsSync(path)) {
+    files = fs.readdirSync(path);
+    files.forEach((file, index) => {
+      let curPath = path + "/" + file;
+      if (fs.statSync(curPath).isDirectory()) {
+        delDir(curPath); //递归删除文件夹
+      } else {
+        fs.unlinkSync(curPath); //删除文件
+      }
+    });
+    fs.rmdirSync(path);
   }
 }
 // 清理
-delDir("./dist")
-// 开始build
-webpack(buildConfs, (err, stats) => {
-  if (err) {
-    console.error(err.stack || err);
-    if (err.details) {
-      console.error(err.details);
+delDir("./dist");
+
+// 一次最多打包三个组件
+startBuild(buildConfs.splice(0,3));
+
+function startBuild(confs) {
+  // 开始build
+  webpack(confs, (err, stats) => {
+    if (err) {
+      console.error(err.stack || err);
+      if (err.details) {
+        console.error(err.details);
+      }
+      return;
     }
-    return;
-  }
 
-  const info = stats.toJson();
+    const info = stats.toJson();
 
-  if (stats.hasErrors()) {
-    console.error(info.errors);
-  }
+    if (stats.hasErrors()) {
+      console.error(info.errors);
+    }
 
-  if (stats.hasWarnings()) {
-    console.warn(info.warnings);
-  }
+    // if (stats.hasWarnings()) {
+    //   console.warn(info.warnings);
+    // }
 
-  console.log(
-    stats.toString({
-      colors: true, // 在控制台展示颜色
-    })
-  );
-});
+    if(buildConfs.length > 0){
+      startBuild(buildConfs.splice(0,3));
+    }
+
+    // buildConfs.length === 0 && console.log('打包完成');
+  });
+}
