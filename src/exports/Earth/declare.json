@@ -5,6 +5,15 @@
       "type": "array",
       "comment": "[{ lat: number; lng: number; value: number },...]",
       "default": []
+    },
+    "cameraPosition": {
+      "type": "object",
+      "comment": "{position:{x:number, y:number, z:number},rotation:{x:number, y:number, z:number}}"
+    }
+  },
+  "events": {
+    "onControl": {
+      "comment": ""
     }
   },
   "title": "地球",

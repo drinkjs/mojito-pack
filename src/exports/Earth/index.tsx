@@ -25,6 +25,14 @@ const domain = [1000, 3000, 10000, 50000, 100000, 500000, 1000000, 1000000]
 
 interface EarthProps {
   barData: { lat: number; lng: number; value: number }[];
+  cameraPosition?:{
+    position:{x:number, y:number, z:number},
+    rotation:{x:number, y:number, z:number},
+  },
+  onControl?:(pos:{
+    position:{x:number, y:number, z:number},
+    rotation:{x:number, y:number, z:number},
+  })=>void
 }
 
 export default class Earth extends React.PureComponent<EarthProps> {
@@ -45,17 +53,25 @@ export default class Earth extends React.PureComponent<EarthProps> {
   controlTimer: any;
   barMeshs:THREE.Object3D[] = [];
 
-  canvasRenderFun = this.canvasRender.bind(this);
-  mousedownHandlerFun = this.mousedownHandler.bind(this);
-  mouseupHandlerFun = this.mouseupHandler.bind(this);
-
   componentDidMount() {
     this.initCanvas();
   }
 
   componentDidUpdate(prevProps: EarthProps) {
-    const { barData } = this.props;
-    if (prevProps.barData !== barData) {
+    const { barData, cameraPosition } = this.props;
+    if (prevProps.cameraPosition !== cameraPosition && cameraPosition && !this.isControling) {
+      this.camera.position.x = cameraPosition.position.x;
+      this.camera.position.y = cameraPosition.position.y;
+      this.camera.position.z = cameraPosition.position.z;
+      this.camera.rotation.x = cameraPosition.rotation.x;
+      this.camera.rotation.y = cameraPosition.rotation.y;
+      this.camera.rotation.z = cameraPosition.rotation.z;
+      this.camera.updateProjectionMatrix();
+      // this.controls.update();
+      return;
+    }
+
+    if (JSON.stringify(prevProps.barData) !== JSON.stringify(barData)) {
       this.pivot.remove(...this.barMeshs);
       this.createBar();
     }
@@ -64,20 +80,35 @@ export default class Earth extends React.PureComponent<EarthProps> {
   componentWillUnmount() {
     clearTimeout(this.controlTimer);
     cancelAnimationFrame(this.requestAnimationFrameNum);
-    this.canvasRenderFun = null;
-    this.controls.removeEventListener("mousedown", this.mousedownHandlerFun);
-    this.controls.removeEventListener("mouseup", this.mouseupHandlerFun);
+    this.controls.removeEventListener("start", this.startHandler);
+    this.controls.removeEventListener("end", this.endHandler);
+    this.controls.removeEventListener("change", this.controlChangeHandler);
   }
 
-  mousedownHandler() {
+  startHandler = ()=> {
     clearTimeout(this.controlTimer);
     this.isControling = true;
   }
 
-  mouseupHandler() {
+  endHandler = ()=> {
     this.controlTimer = setTimeout(() => {
       this.isControling = false;
     }, 500);
+  }
+
+  controlChangeHandler = ()=>{
+    const {onControl} = this.props;
+    const {position, rotation} = this.controls.object
+    if(onControl && this.isControling){
+      onControl({
+        position,
+        rotation:{
+          x: rotation.x,
+          y: rotation.y,
+          z: rotation.z,
+        }
+      });
+    }
   }
 
   initCanvas() {
@@ -95,12 +126,15 @@ export default class Earth extends React.PureComponent<EarthProps> {
     const near = 1;
     const far = 4000;
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this.camera.position.z = 400;
+    this.camera.position.z = 500;
+
+    this.camera.rotation
 
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.target.set(0, 0, 0);
-    this.controls.addEventListener("start", this.mousedownHandlerFun);
-    this.controls.addEventListener("end", this.mouseupHandlerFun);
+    this.controls.addEventListener("start", this.startHandler);
+    this.controls.addEventListener("end", this.endHandler);
+    this.controls.addEventListener("change", this.controlChangeHandler);
 
     // 创建一个球体
     const geometry = new THREE.SphereGeometry(
@@ -136,11 +170,9 @@ export default class Earth extends React.PureComponent<EarthProps> {
    * 渲染场景
    * @param time
    */
-  canvasRender(time?: number) {
-    if (!this.canvasRenderFun) return;
-
+  canvasRender = (time?: number)=> {
     if (!this.isControling) {
-      this.pivot.rotation.y += 0.001;
+      // this.pivot.rotation.y += 0.001;
     }
     this.controls.update();
     // 更新
@@ -151,7 +183,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
     }
 
     this.glRender.render(this.scene, this.camera);
-    this.requestAnimationFrameNum = requestAnimationFrame(this.canvasRenderFun);
+    this.requestAnimationFrameNum = requestAnimationFrame(this.canvasRender);
   }
 
   /**
@@ -218,7 +250,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
 
     barData.forEach(({ lat, lng, value: size }) => {
       color = scale(size);
-      size = size / 10000;
+      size = size / 20000;
       const pos = this.convertLatLngToSphereCoords(lat, lng, globeRadius);
 
       if (pos.x && pos.y && pos.z) {
