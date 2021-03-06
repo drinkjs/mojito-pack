@@ -11,28 +11,34 @@ const globeWidth = 4098 / 2;
 const globeHeight = 1968 / 2;
 
 const colors = [
-  "#ffdfe0", 
+  "#ffdfe0",
   "#ffc0c0",
   "#FF0000",
   "#ee7070",
-  "#c80200", 
+  "#c80200",
   "#900000",
   "#510000",
   "#290000",
-]
+];
 
-const domain = [1000, 3000, 10000, 50000, 100000, 500000, 1000000, 1000000]
+const domain = [1000, 3000, 10000, 50000, 100000, 500000, 1000000, 1000000];
 
 interface EarthProps {
   barData: { lat: number; lng: number; value: number }[];
-  cameraPosition?:{
-    position:{x:number, y:number, z:number},
-    rotation:{x:number, y:number, z:number},
-  },
-  onControl?:(pos:{
-    position:{x:number, y:number, z:number},
-    rotation:{x:number, y:number, z:number},
-  })=>void
+  syncPosition?: {
+    position: { x: number; y: number; z: number };
+    rotation: { x: number; y: number; z: number };
+    earthRotation: { x: number; y: number; z: number };
+  };
+  onControl?: (
+    pos: {
+      position: { x: number; y: number; z: number };
+      rotation: { x: number; y: number; z: number };
+      earthRotation: { x: number; y: number; z: number };
+    },
+    isEnd?: boolean
+  ) => void;
+  isEnd?: boolean;
 }
 
 export default class Earth extends React.PureComponent<EarthProps> {
@@ -51,23 +57,30 @@ export default class Earth extends React.PureComponent<EarthProps> {
   requestAnimationFrameNum: number;
   isControling = false;
   controlTimer: any;
-  barMeshs:THREE.Object3D[] = [];
+  barMeshs: THREE.Object3D[] = [];
 
   componentDidMount() {
     this.initCanvas();
   }
 
   componentDidUpdate(prevProps: EarthProps) {
-    const { barData, cameraPosition } = this.props;
-    if (prevProps.cameraPosition !== cameraPosition && cameraPosition && !this.isControling) {
-      this.camera.position.x = cameraPosition.position.x;
-      this.camera.position.y = cameraPosition.position.y;
-      this.camera.position.z = cameraPosition.position.z;
-      this.camera.rotation.x = cameraPosition.rotation.x;
-      this.camera.rotation.y = cameraPosition.rotation.y;
-      this.camera.rotation.z = cameraPosition.rotation.z;
-      this.camera.updateProjectionMatrix();
-      // this.controls.update();
+    const { barData, syncPosition } = this.props;
+
+    if (
+      prevProps.syncPosition !== syncPosition &&
+      syncPosition &&
+      !this.isControling
+    ) {
+      this.camera.position.x = syncPosition.position.x;
+      this.camera.position.y = syncPosition.position.y;
+      this.camera.position.z = syncPosition.position.z;
+      this.camera.rotation.x = syncPosition.rotation.x;
+      this.camera.rotation.y = syncPosition.rotation.y;
+      this.camera.rotation.z = syncPosition.rotation.z;
+      this.pivot.rotation.x = syncPosition.earthRotation.x;
+      this.pivot.rotation.y = syncPosition.earthRotation.y;
+      this.pivot.rotation.z = syncPosition.earthRotation.z;
+      // this.camera.updateProjectionMatrix();
       return;
     }
 
@@ -85,31 +98,59 @@ export default class Earth extends React.PureComponent<EarthProps> {
     this.controls.removeEventListener("change", this.controlChangeHandler);
   }
 
-  startHandler = ()=> {
+  startHandler = () => {
     clearTimeout(this.controlTimer);
     this.isControling = true;
-  }
+  };
 
-  endHandler = ()=> {
+  endHandler = () => {
+    const { onControl } = this.props;
+    const { position, rotation } = this.controls.object;
     this.controlTimer = setTimeout(() => {
+      if (onControl && this.isControling) {
+        onControl(
+          {
+            position,
+            rotation: {
+              x: rotation.x,
+              y: rotation.y,
+              z: rotation.z,
+            },
+            earthRotation: {
+              x: this.pivot.rotation.x,
+              y: this.pivot.rotation.y,
+              z: this.pivot.rotation.z,
+            },
+          },
+          true
+        );
+      }
       this.isControling = false;
     }, 500);
-  }
+  };
 
-  controlChangeHandler = ()=>{
-    const {onControl} = this.props;
-    const {position, rotation} = this.controls.object
-    if(onControl && this.isControling){
-      onControl({
-        position,
-        rotation:{
-          x: rotation.x,
-          y: rotation.y,
-          z: rotation.z,
-        }
-      });
+  controlChangeHandler = () => {
+    const { onControl } = this.props;
+    const { position, rotation } = this.controls.object;
+    if (onControl && this.isControling) {
+      onControl(
+        {
+          position,
+          rotation: {
+            x: rotation.x,
+            y: rotation.y,
+            z: rotation.z,
+          },
+          earthRotation: {
+            x: this.pivot.rotation.x,
+            y: this.pivot.rotation.y,
+            z: this.pivot.rotation.z,
+          },
+        },
+        false
+      );
     }
-  }
+  };
 
   initCanvas() {
     const canvas = this.canvasRef.current;
@@ -128,7 +169,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     this.camera.position.z = 500;
 
-    this.camera.rotation
+    this.camera.rotation;
 
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.target.set(0, 0, 0);
@@ -170,9 +211,10 @@ export default class Earth extends React.PureComponent<EarthProps> {
    * 渲染场景
    * @param time
    */
-  canvasRender = (time?: number)=> {
-    if (!this.isControling) {
-      // this.pivot.rotation.y += 0.001;
+  canvasRender = (time?: number) => {
+    const { isEnd = true } = this.props;
+    if (!this.isControling && isEnd) {
+      this.pivot.rotation.y += 0.001;
     }
     this.controls.update();
     // 更新
@@ -184,7 +226,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
 
     this.glRender.render(this.scene, this.camera);
     this.requestAnimationFrameNum = requestAnimationFrame(this.canvasRender);
-  }
+  };
 
   /**
    * canvas自适应
@@ -244,9 +286,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
 
     let color;
 
-    const scale = d3Scale.scaleLinear()
-    .domain(domain)
-    .range(colors);
+    const scale = d3Scale.scaleLinear().domain(domain).range(colors);
 
     barData.forEach(({ lat, lng, value: size }) => {
       color = scale(size);
