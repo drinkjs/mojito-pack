@@ -7,8 +7,8 @@ interface TextViewProps {
 
 export default ({ text, styles }: TextViewProps) => {
   return (
-    <div style={{ color: "blue", ...styles, width: "100%", height: "100%" }}>
-      {text === undefined ? "请输入文档" : text}
+    <div style={{ color: "blue", fontSize:"32px", width: "100%", height: "100%", display:"flex", alignItems:"center", justifyContent:"center", ...styles }}>
+      {text === undefined ? "请设置文本" : text}
     </div>
   );
 };
