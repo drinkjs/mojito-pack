@@ -9,7 +9,7 @@ const ZipPlugin = require("zip-webpack-plugin");
 const exportPath = "./src/exports";
 const ROOT_PATH = path.resolve(process.cwd());
 const APP_PATH = `${ROOT_PATH}/src`;
-const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx"];
+const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx", "index.vue"];
 const declareFile = "declare.json";
 
 const buildFile = [];
@@ -67,14 +67,12 @@ libs.forEach((libName) => {
         path: path.resolve(__dirname, `dist/${libName}`),
       },
       plugins: [
-        // new CleanWebpackPlugin(),
-        new CopyWebpackPlugin([
-          {
-            context: `${APP_PATH}/exports/${libName}`,
-            from: declareFile,
-            to: declareFile,
-          },
-        ]),
+        new CopyWebpackPlugin({
+          patterns:[{
+            from: `${APP_PATH}/exports/${libName}/${declareFile}`,
+            to: `${ROOT_PATH}/dist/${libName}/${declareFile}`,
+          }],
+        }),
         new ZipPlugin(),
       ],
       module: {
@@ -118,7 +116,7 @@ function delDir(path) {
 // 清理
 delDir("./dist");
 
-// 一次最多打包三个组件
+// 一次最多打包三个组件，不然很容易崩
 startBuild(buildConfs.splice(0,3));
 
 function startBuild(confs) {
@@ -138,14 +136,10 @@ function startBuild(confs) {
       console.error(info.errors);
     }
 
-    // if (stats.hasWarnings()) {
-    //   console.warn(info.warnings);
-    // }
-
     if(buildConfs.length > 0){
       startBuild(buildConfs.splice(0,3));
+    }else{
+      console.log("打包完成")
     }
-
-    // buildConfs.length === 0 && console.log('打包完成');
   });
 }
