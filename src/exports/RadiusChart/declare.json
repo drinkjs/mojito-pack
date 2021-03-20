@@ -50,5 +50,8 @@
     }
   },
   "title": "基础环形图",
-  "libName": "RadiusChart"
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+  ],
+  "name": "RadiusChart"
 }

@@ -6,5 +6,6 @@
       "default": ""
     }
   },
-  "libName": "Image"
+  "libName": "Image",
+  "name": "Image"
 }

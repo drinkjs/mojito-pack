@@ -2,6 +2,7 @@
   "version": "v1.0.0",
   "props": {
     "data": {
+      "name": "数据",
       "type": [],
       "comment": "图表数据[{name:类型1, value:100}, ...]",
       "default": [
@@ -44,6 +45,7 @@
       ]
     },
     "option": {
+      "name": "echarts配置",
       "type": "object",
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
@@ -51,9 +53,13 @@
   },
   "events": {
     "onCreated": {
+      "name": "图表初始化完成",
       "comment": "图表初始化完成事件(echart)=>void"
     }
   },
   "title": "基础柱状图",
-  "libName": "BarChart"
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+  ],
+  "name": "BarChart"
 }

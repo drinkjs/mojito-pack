@@ -23,5 +23,8 @@
     }
   },
   "title": "基础仪表盘",
-  "libName": "GaugeChart"
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+  ],
+  "name": "GaugeChart"
 }

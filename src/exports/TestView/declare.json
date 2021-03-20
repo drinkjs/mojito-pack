@@ -7,5 +7,6 @@
     }
   },
   "title": "组件测试",
-  "libName": "TestView"
+  "libName": "TestView",
+  "name": "TestView"
 }

@@ -49,5 +49,8 @@
     }
   },
   "title": "基础雷达图",
-  "libName": "RadarChart"
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+  ],
+  "name": "RadarChart"
 }
