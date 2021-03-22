@@ -14,7 +14,8 @@ module.exports = function(webpackConf) {
       "react-dom": "ReactDOM",
       echarts: "echarts",
       antd: "antd",
-      THREE: "three",
+      three: "THREE",
+      lodash: "lodash",
     },
     plugins: [
       new WebpackBar()

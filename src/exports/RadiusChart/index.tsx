@@ -62,7 +62,6 @@ export default (props: Props) => {
           position: "outer",
           alignTo: "none",
           bleedMargin: 5,
-          color:"#fff",
         },
         labelLine: {
           show: true,

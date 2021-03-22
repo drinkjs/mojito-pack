@@ -24,7 +24,8 @@
   },
   "title": "基础仪表盘",
   "dependencies": [
-    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
+    "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
   ],
   "name": "GaugeChart"
 }

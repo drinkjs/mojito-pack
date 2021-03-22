@@ -30,7 +30,7 @@ export default (props: Props) => {
     series: [
       {
         type: "pie",
-        radius: "90%",
+        radius: "85%",
         center: ["50%", "50%"],
         selectedMode: "single",
         data: _data,

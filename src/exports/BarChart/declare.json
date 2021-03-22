@@ -37,6 +37,7 @@
       ]
     },
     "linearGradient": {
+      "name": "柱体颜色",
       "type": "array",
       "comment": "渐变色",
       "default": [
@@ -59,7 +60,8 @@
   },
   "title": "基础柱状图",
   "dependencies": [
-    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js"
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
+    "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
   ],
   "name": "BarChart"
 }
