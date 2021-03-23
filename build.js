@@ -9,7 +9,13 @@ const ZipPlugin = require("zip-webpack-plugin");
 const exportPath = "./src/exports";
 const ROOT_PATH = path.resolve(process.cwd());
 const APP_PATH = `${ROOT_PATH}/src`;
-const extensions = ["index.js", "index.ts", "index.jsx", "index.tsx", "index.vue"];
+const extensions = [
+  "index.js",
+  "index.ts",
+  "index.jsx",
+  "index.tsx",
+  "index.vue",
+];
 const declareFile = "declare.json";
 
 const buildFile = [];
@@ -46,11 +52,14 @@ libs.forEach((libName) => {
   const declare = JSON.parse(
     fs.readFileSync(`${entryPath}/${declareFile}`, "utf8")
   );
-  declare.name = libName;
-  fs.writeFileSync(
-    `${entryPath}/${declareFile}`,
-    JSON.stringify(declare, null, 2)
-  );
+  // 没写组件名，使用目录名作为组件名
+  if (!declare.name) {
+    declare.name = libName;
+    fs.writeFileSync(
+      `${entryPath}/${declareFile}`,
+      JSON.stringify(declare, null, 2)
+    );
+  }
 
   if (!declare.version) {
     console.error(`${declare.name}缺少版本号`);
@@ -68,10 +77,12 @@ libs.forEach((libName) => {
       },
       plugins: [
         new CopyWebpackPlugin({
-          patterns:[{
-            from: `${APP_PATH}/exports/${libName}/${declareFile}`,
-            to: `${ROOT_PATH}/dist/${libName}/${declareFile}`,
-          }],
+          patterns: [
+            {
+              from: `${exportPath}/${libName}/${declareFile}`,
+              to: `${ROOT_PATH}/dist/${libName}/${declareFile}`,
+            },
+          ],
         }),
         new ZipPlugin(),
       ],
@@ -117,7 +128,7 @@ function delDir(path) {
 delDir("./dist");
 
 // 一次最多打包三个组件，不然很容易崩
-startBuild(buildConfs.splice(0,3));
+startBuild(buildConfs.splice(0, 3));
 
 function startBuild(confs) {
   // 开始build
@@ -136,10 +147,10 @@ function startBuild(confs) {
       console.error(info.errors);
     }
 
-    if(buildConfs.length > 0){
-      startBuild(buildConfs.splice(0,3));
-    }else{
-      console.log("打包完成")
+    if (buildConfs.length > 0) {
+      startBuild(buildConfs.splice(0, 3));
+    } else {
+      console.log("打包完成");
     }
   });
 }

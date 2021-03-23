@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "start-storybook -p 6006 -s ./resources --no-dll",
+    "start": "start-storybook -p 6006 -s ./resources --no-dll --no-manager-cache",
     "build-storybook": "build-storybook --no-dll",
     "build-webpack": "webpack --config webpack.conf.js --progress --colors --display-modules",
     "build": "node build.js"
