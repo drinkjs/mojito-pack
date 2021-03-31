@@ -64,11 +64,6 @@
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     },
-    "smooth": {
-      "type": "boolean",
-      "name": "平滑",
-      "default": false
-    },
     "theme": {
       "name": "主题",
       "type": [
