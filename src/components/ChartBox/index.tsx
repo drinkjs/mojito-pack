@@ -5,24 +5,36 @@ const { useState, useRef, useEffect } = React;
 
 export interface ChartBoxProps {
   option?: any;
-  onCreated?: (echar: echarts.ECharts) => void;
-  styles?:React.CSSProperties
-  className?:string
+  styles?: React.CSSProperties;
+  className?: string;
+  theme?:"dark"|"light"
 }
 
-export default ({ option, onCreated, styles, ...restProps }: ChartBoxProps) => {
+export default ({ option, theme, styles, ...restProps }: ChartBoxProps) => {
   const [chart, setChart] = useState<echarts.ECharts>();
   const targetRef = useRef();
 
+  const colors = theme === "dark" ? {
+    backgroundColor: "#2c343c",
+    textStyle: {
+      color: "rgba(255, 255, 255, 0.5)",
+    },
+  } : {
+    backgroundColor: "rgba(255, 255, 255, 0)",
+    textStyle: {
+      color: "rgba(0, 0, 0, 0.5)",
+    },
+  }
+
   useEffect(() => {
     const myChart = echarts.init(targetRef.current);
-    myChart.setOption(option);
+    myChart.setOption({
+      ...colors,
+      ...option,
+    });
     setChart(myChart);
-    if (onCreated) {
-      onCreated(myChart);
-    }
     return () => {
-      if(myChart){
+      if (myChart) {
         myChart.clear();
         myChart.dispose();
       }
@@ -30,14 +42,18 @@ export default ({ option, onCreated, styles, ...restProps }: ChartBoxProps) => {
   }, []);
 
   useEffect(() => {
-    if (chart) chart.setOption(option);
-  }, [option, chart]);
+    if (chart) chart.setOption({...colors, ...option});
+  }, [option, theme, chart]);
 
   useEffect(() => {
     if (chart) chart.resize();
   }, [chart, styles]);
 
   return (
-    <div ref={targetRef} {...restProps} style={{width:"100%",height:"100%", ...styles}} ></div>
+    <div
+      ref={targetRef}
+      {...restProps}
+      style={{ width: "100%", height: "100%", ...styles }}
+    ></div>
   );
 };

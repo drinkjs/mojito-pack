@@ -16,5 +16,8 @@ Primary.args = {
     width:"500px",
     height:"300px"
   },
-  data: conf.props.data.default
+  data: conf.props.data.default,
+  smooth: true,
+  theme: "dark",
+  itemColor:"#ff0000"
 };

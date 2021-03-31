@@ -4,7 +4,7 @@ import Chart from './index'
 const data = require("./data.json")
 
 export default {
-  title: 'Echarts/多折线图',
+  title: 'Echarts/多柱状图',
   component: Chart,
 };
 
@@ -34,6 +34,5 @@ Primary.args = {
     },
   ],
   xData: ["2/15", "2/16", "2/17", "2/18", "2/19", "2/20", "2/21"],
-  smooth: true,
   theme: "dark",
 };

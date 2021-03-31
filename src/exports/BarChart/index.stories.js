@@ -29,5 +29,5 @@ Primary.args = {
     width:"500px",
     height:"300px"
   },
-  data: formatData
+  data: formatData,
 };

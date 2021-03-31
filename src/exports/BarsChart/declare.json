@@ -60,25 +60,28 @@
     },
     "option": {
       "type": "object",
-      "name":"配置",
+      "name": "配置",
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     },
     "smooth": {
-      "type":"boolean",
-      "name":"平滑",
+      "type": "boolean",
+      "name": "平滑",
       "default": false
     },
-    "theme":{
-      "name":"主题",
-      "type":["dark", "light"],
-      "default":"dark"
+    "theme": {
+      "name": "主题",
+      "type": [
+        "dark",
+        "light"
+      ],
+      "default": "dark"
     }
   },
-  "title": "多折线图",
+  "title": "多柱状图",
   "dependencies": [
     "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
     "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
   ],
-  "name": "LinesChart"
+  "name": "BarsChart"
 }

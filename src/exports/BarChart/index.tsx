@@ -10,11 +10,11 @@ interface ChartData {
 
 interface Props extends ChartBoxProps {
   data: ChartData[];
-  linearGradient?:string[]
+  itemColors?:string[]
 }
 
 export default (props: Props) => {
-  const { data, option, linearGradient=["#ff0000", "#330000"],  ...restProps } = props;
+  const { data, option, itemColors=["#ff0000", "#330000"],  ...restProps } = props;
   const _data = data || [];
   const opt = {
     xAxis: {
@@ -41,8 +41,8 @@ export default (props: Props) => {
           color: new echarts.graphic.LinearGradient(
               0, 0, 0, 1,
               [
-                  {offset: 0, color: linearGradient[0]},
-                  {offset: 1, color: linearGradient[1]}
+                  {offset: 0, color: itemColors[0]},
+                  {offset: 1, color: itemColors[1]}
               ]
           )
         },

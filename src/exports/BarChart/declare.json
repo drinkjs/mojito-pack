@@ -36,26 +36,24 @@
         }
       ]
     },
-    "linearGradient": {
+    "itemColors": {
       "name": "柱体颜色",
       "type": "array",
-      "comment": "渐变色",
       "default": [
         "#ff0000",
         "#330000"
       ]
     },
     "option": {
-      "name": "echarts配置",
+      "name": "配置",
       "type": "object",
-      "comment": "echarts配置，具体参考echarts官网",
+      "comment": "Echarts配置，具体参考echarts官网",
       "default": {}
-    }
-  },
-  "events": {
-    "onCreated": {
-      "name": "图表初始化完成",
-      "comment": "图表初始化完成事件(echart)=>void"
+    },
+    "theme":{
+      "name":"主题",
+      "type":["dark", "light"],
+      "default":"dark"
     }
   },
   "title": "基础柱状图",

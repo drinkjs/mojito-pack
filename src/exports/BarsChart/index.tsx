@@ -11,24 +11,22 @@ interface ChartData {
 interface LinesProps extends ChartBoxProps {
   data: ChartData[];
   xData: string[];
-  smooth: boolean
 }
 
 export default (props: LinesProps) => {
-  const { option, data, xData, smooth, theme, ...restProps } = props;
+  const { option, data, xData, theme, ...restProps } = props;
   const _data = data || [];
 
   const legend: string[] = [];
-  const series:any = [];
+  const series: any = [];
 
   // 图例
   _data.forEach((v) => {
     legend.push(v.type);
     series.push({
       name: v.type,
-      type: "line",
+      type: "bar",
       data: v.value,
-      smooth,
       itemStyle: {
         color: v.color,
       },
@@ -38,17 +36,20 @@ export default (props: LinesProps) => {
   const opt = {
     tooltip: {
       trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
     },
     legend: {
       data: legend, // ["分类1", "分类2", "分类3"],
       textStyle: {
-        color: theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
+        color:
+          theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
       },
       icon: "rect",
     },
     xAxis: {
       type: "category",
-      boundaryGap: false,
       data: xData, // ["2/15", "2/16", "2/17", "2/18", "2/19", "2/20", "2/21"],
     },
     yAxis: {
@@ -69,5 +70,11 @@ export default (props: LinesProps) => {
     series,
   };
 
-  return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} theme={theme} />;
+  return (
+    <ChartBox
+      {...restProps}
+      option={option ? merge(opt, option) : opt}
+      theme={theme}
+    />
+  );
 };
