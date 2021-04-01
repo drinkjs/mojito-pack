@@ -10,7 +10,7 @@ interface ChartData {
 interface LineChartProps extends ChartBoxProps {
   data: ChartData[];
   smooth: boolean;
-  itemColor?:string
+  itemColor?: string;
 }
 
 export default (props: LineChartProps) => {

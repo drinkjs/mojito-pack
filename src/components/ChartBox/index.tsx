@@ -22,7 +22,7 @@ export default ({ option, theme, styles, ...restProps }: ChartBoxProps) => {
   } : {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textStyle: {
-      color: "rgba(0, 0, 0, 0.5)",
+      color: "rgba(0, 0, 0, 0.8)",
     },
   }
 

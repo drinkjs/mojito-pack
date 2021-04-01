@@ -15,7 +15,7 @@ module.exports = function(webpackConf) {
       echarts: "echarts",
       antd: "antd",
       three: "THREE",
-      lodash: "lodash",
+      lodash: "_",
     },
     plugins: [
       new WebpackBar()
