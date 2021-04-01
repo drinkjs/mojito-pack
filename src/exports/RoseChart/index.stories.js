@@ -4,7 +4,7 @@ import PieChart from './index'
 const conf = require("./declare.json")
 
 export default {
-  title: 'Echarts/饼图',
+  title: 'Echarts/南丁格尔玫瑰图',
   component: PieChart,
 };
 

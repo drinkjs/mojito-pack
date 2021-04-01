@@ -50,7 +50,6 @@ export default (props: Props) => {
   const opt = {
     tooltip: {
       trigger: "item",
-      formatter: "{b}: {c} ({d}%)",
     },
     series: [
       {

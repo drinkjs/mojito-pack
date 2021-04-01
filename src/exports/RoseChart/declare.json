@@ -42,6 +42,14 @@
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     },
+    "radius": {
+      "type": "array",
+      "name":"半径",
+      "comment": "内外圆半径",
+      "default": [
+        "25%","90%"
+      ]
+    },
     "theme": {
       "name": "主题",
       "type": [
@@ -51,10 +59,10 @@
       "default": "dark"
     }
   },
-  "title": "基础饼图",
+  "title": "南丁格尔玫瑰图",
   "dependencies": [
     "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
     "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
   ],
-  "name": "PieChart"
+  "name": "RoseChart"
 }

@@ -49,6 +49,7 @@
     },
     "itemColor":{
       "name":"线段颜色",
+      "comment": "如：#FF0000",
       "type":"string"
     },
     "theme":{

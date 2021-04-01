@@ -3,34 +3,37 @@ import { merge } from "lodash";
 import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
-  type: string;
-  value: number[];
+  name: string;
+  data: { category: string; value: number }[];
   color?: string;
 }
 
-interface LinesProps extends ChartBoxProps {
+interface BarsProps extends ChartBoxProps {
   data: ChartData[];
-  xData: string[];
 }
 
-export default (props: LinesProps) => {
-  const { option, data, xData, theme, ...restProps } = props;
+export default (props: BarsProps) => {
+  const { option, data, theme, ...restProps } = props;
   const _data = data || [];
 
   const legend: string[] = [];
   const series: any = [];
+  let xData: string[] = [];
 
   // 图例
-  _data.forEach((v) => {
-    legend.push(v.type);
+  _data.forEach((v, index) => {
+    legend.push(v.name);
     series.push({
-      name: v.type,
+      name: v.name,
       type: "bar",
-      data: v.value,
+      data: v.data.map((v) => v.value),
       itemStyle: {
         color: v.color,
       },
     });
+    if (index === 0) {
+      xData = v.data.map((v) => v.category);
+    }
   });
 
   const opt = {
@@ -54,11 +57,11 @@ export default (props: LinesProps) => {
     },
     yAxis: {
       type: "value",
-      splitLine: {
-        show: false,
-      },
       axisLabel: {
         formatter: "{value}",
+      },
+      splitLine: {
+        show: false,
       },
       axisLine: {
         show: true,

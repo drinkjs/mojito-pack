@@ -6,56 +6,93 @@
       "comment": "图表数据[{type:string, value:[100, 200, ...], color?:string}, ...]",
       "default": [
         {
-          "type": "分类1",
-          "value": [
-            10,
-            11,
-            13,
-            11,
-            12,
-            12,
-            9
+          "name": "类型1",
+          "data": [
+            {
+              "category": "2/15",
+              "value": 22
+            },
+            {
+              "category": "2/16",
+              "value": 50
+            },
+            {
+              "category": "2/17",
+              "value": 100
+            },
+            {
+              "category": "2/18",
+              "value": 120
+            },
+            {
+              "category": "2/19",
+              "value": 67
+            },
+            {
+              "category": "2/20",
+              "value": 55
+            }
           ],
           "color": "#FF0000"
         },
         {
-          "type": "分类2",
-          "value": [
-            1,
-            2,
-            2,
-            5,
-            3,
-            2,
-            60
-          ],
-          "color": "#510000"
+          "name": "类型2",
+          "data": [
+            {
+              "category": "2/15",
+              "value": 200
+            },
+            {
+              "category": "2/16",
+              "value": 121
+            },
+            {
+              "category": "2/17",
+              "value": 121
+            },
+            {
+              "category": "2/18",
+              "value": 222
+            },
+            {
+              "category": "2/19",
+              "value": 222
+            },
+            {
+              "category": "2/20",
+              "value": 1111
+            }
+          ]
         },
         {
-          "type": "分类3",
-          "value": [
-            100,
-            25,
-            20,
-            50,
-            3,
-            28,
-            60
-          ],
-          "color": "#ffc0c0"
+          "name": "类型3",
+          "data": [
+            {
+              "category": "2/15",
+              "value": 11
+            },
+            {
+              "category": "2/16",
+              "value": 42
+            },
+            {
+              "category": "2/17",
+              "value": 140
+            },
+            {
+              "category": "2/18",
+              "value": 200
+            },
+            {
+              "category": "2/19",
+              "value": 66
+            },
+            {
+              "category": "2/20",
+              "value": 57
+            }
+          ]
         }
-      ]
-    },
-    "xData": {
-      "type": "array",
-      "default": [
-        "2/15",
-        "2/16",
-        "2/17",
-        "2/18",
-        "2/19",
-        "2/20",
-        "2/21"
       ]
     },
     "option": {

@@ -1,18 +1,19 @@
 import * as React from "react";
-import {merge} from 'lodash';
-import ChartBox, {ChartBoxProps} from "../../components/ChartBox";
+import { merge } from "lodash";
+import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
-  name: string,
-  value: number,
+  name: string;
+  value: number;
 }
 
-interface Props extends ChartBoxProps{
-  data: ChartData[]
+interface Props extends ChartBoxProps {
+  data: ChartData[];
+  radius?: []
 }
 
 export default (props: Props) => {
-  const { data, option, ...restProps } = props;
+  const { data, option, radius=["25%","90%"], ...restProps } = props;
   const _data = data || [];
 
   const opt = {
@@ -29,7 +30,8 @@ export default (props: Props) => {
     series: [
       {
         type: "pie",
-        radius: "85%",
+        roseType: "radius",
+        radius,
         center: ["50%", "50%"],
         selectedMode: "single",
         data: _data,
@@ -43,12 +45,7 @@ export default (props: Props) => {
       },
     ],
     ...option,
-  }
+  };
 
-  return (
-    <ChartBox
-      {...restProps}
-      option={option ? merge(opt, option) : opt}
-    />
-  );
+  return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} />;
 };

@@ -8,12 +8,12 @@ interface ChartData {
   value: number;
 }
 
-interface Props extends ChartBoxProps {
+interface BarProps extends ChartBoxProps {
   data: ChartData[];
   itemColors?:string[]
 }
 
-export default (props: Props) => {
+export default (props: BarProps) => {
   const { data, option, itemColors=["#ff0000", "#330000"],  ...restProps } = props;
   const _data = data || [];
   const opt = {

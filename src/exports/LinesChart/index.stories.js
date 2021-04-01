@@ -1,10 +1,8 @@
-import React from 'react';
-import Chart from './index'
-
-const data = require("./data.json")
+import React from "react";
+import Chart from "./index";
 
 export default {
-  title: 'Echarts/多折线图',
+  title: "Echarts/多折线图",
   component: Chart,
 };
 
@@ -18,22 +16,94 @@ Primary.args = {
   },
   data: [
     {
-      type: "新增",
-      value: [10, 11, 13, 11, 12, 12, 9],
+      name: "新增",
+      data: [
+        {
+          category: "2/15",
+          value: 22,
+        },
+        {
+          category: "2/16",
+          value: 50,
+        },
+        {
+          category: "2/17",
+          value: 100,
+        },
+        {
+          category: "2/18",
+          value: 120,
+        },
+        {
+          category: "2/19",
+          value: 67,
+        },
+        {
+          category: "2/20",
+          value: 55,
+        },
+      ],
       color: "#FF0000",
     },
     {
-      type: "死亡",
-      value: [1, 2, 2, 5, 3, 2, 60],
-      color: "#510000",
+      name: "死亡",
+      data: [
+        {
+          category: "2/15",
+          value: 200,
+        },
+        {
+          category: "2/16",
+          value: 121,
+        },
+        {
+          category: "2/17",
+          value: 121,
+        },
+        {
+          category: "2/18",
+          value: 222,
+        },
+        {
+          category: "2/19",
+          value: 222,
+        },
+        {
+          category: "2/20",
+          value: 1111,
+        },
+      ],
     },
     {
-      type: "康复",
-      value: [100, 25, 20, 50, 3, 28, 60],
-      color: "#ffc0c0",
+      name: "康复",
+      data: [
+        {
+          category: "2/15",
+          value: 11,
+        },
+        {
+          category: "2/16",
+          value: 42,
+        },
+        {
+          category: "2/17",
+          value: 140,
+        },
+        {
+          category: "2/18",
+          value: 200,
+        },
+        {
+          category: "2/19",
+          value: 66,
+        },
+        {
+          category: "2/20",
+          value: 57,
+        },
+      ],
     },
   ],
-  xData: ["2/15", "2/16", "2/17", "2/18", "2/19", "2/20", "2/21"],
   smooth: true,
   theme: "dark",
 };

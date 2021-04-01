@@ -1,0 +1,162 @@
+{
+  "version": "v1.0.0",
+  "props": {
+    "data": {
+      "type": "array",
+      "comment": "图表数据[{type:string, value:[100, 200, ...], color?:string}, ...]",
+      "default": [
+        {
+          "name": "直接访问",
+          "stack": "广告",
+          "data": [
+            {
+              "category": "周一",
+              "value": 100
+            },
+            {
+              "category": "周二",
+              "value": 200
+            },
+            {
+              "category": "周三",
+              "value": 150
+            },
+            {
+              "category": "周四",
+              "value": 180
+            },
+            {
+              "category": "周五",
+              "value": 50
+            }
+          ]
+        },
+        {
+          "name": "邮件营销",
+          "stack": "广告",
+          "data": [
+            {
+              "category": "周一",
+              "value": 66
+            },
+            {
+              "category": "周二",
+              "value": 500
+            },
+            {
+              "category": "周三",
+              "value": 88
+            },
+            {
+              "category": "周四",
+              "value": 66
+            },
+            {
+              "category": "周五",
+              "value": 100
+            }
+          ]
+        },
+        {
+          "name": "联盟广告",
+          "stack": "广告",
+          "data": [
+            {
+              "category": "周一",
+              "value": 444
+            },
+            {
+              "category": "周二",
+              "value": 500
+            },
+            {
+              "category": "周三",
+              "value": 32
+            },
+            {
+              "category": "周四",
+              "value": 456
+            },
+            {
+              "category": "周五",
+              "value": 210
+            }
+          ]
+        },
+        {
+          "name": "百度",
+          "stack": "搜索引擎",
+          "color": "#ff00ff",
+          "data": [
+            {
+              "category": "周一",
+              "value": 444
+            },
+            {
+              "category": "周二",
+              "value": 500
+            },
+            {
+              "category": "周三",
+              "value": 32
+            },
+            {
+              "category": "周四",
+              "value": 456
+            },
+            {
+              "category": "周五",
+              "value": 210
+            }
+          ]
+        },
+        {
+          "name": "谷歌",
+          "stack": "搜索引擎",
+          "data": [
+            {
+              "category": "周一",
+              "value": 444
+            },
+            {
+              "category": "周二",
+              "value": 500
+            },
+            {
+              "category": "周三",
+              "value": 32
+            },
+            {
+              "category": "周四",
+              "value": 456
+            },
+            {
+              "category": "周五",
+              "value": 210
+            }
+          ]
+        }
+      ]
+    },
+    "option": {
+      "type": "object",
+      "name": "配置",
+      "comment": "echarts配置，具体参考echarts官网",
+      "default": {}
+    },
+    "theme": {
+      "name": "主题",
+      "type": [
+        "dark",
+        "light"
+      ],
+      "default": "dark"
+    }
+  },
+  "title": "堆叠柱状图",
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
+    "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
+  ],
+  "name": "StackedBarChart"
+}

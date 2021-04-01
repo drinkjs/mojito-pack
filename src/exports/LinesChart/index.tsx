@@ -3,36 +3,39 @@ import { merge } from "lodash";
 import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
-  type: string;
-  value: number[];
+  name: string;
+  data: { category: string; value: number }[];
   color?: string;
 }
 
 interface LinesProps extends ChartBoxProps {
   data: ChartData[];
-  xData: string[];
-  smooth: boolean
+  smooth: boolean;
 }
 
 export default (props: LinesProps) => {
-  const { option, data, xData, smooth, theme, ...restProps } = props;
+  const { option, data, smooth, theme, ...restProps } = props;
   const _data = data || [];
 
-  const legend: string[] = [];
-  const series:any = [];
+  const legend: string[] = []; 
+  const series: any = [];
+  let xData: string[] = [];
 
   // 图例
-  _data.forEach((v) => {
-    legend.push(v.type);
+  _data.forEach((v, index) => {
+    legend.push(v.name);
     series.push({
-      name: v.type,
+      name: v.name,
       type: "line",
-      data: v.value,
+      data: v.data.map((v) => v.value),
       smooth,
       itemStyle: {
         color: v.color,
       },
     });
+    if (index === 0) {
+      xData = v.data.map((v) => v.category);
+    }
   });
 
   const opt = {
@@ -42,7 +45,8 @@ export default (props: LinesProps) => {
     legend: {
       data: legend, // ["分类1", "分类2", "分类3"],
       textStyle: {
-        color: theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
+        color:
+          theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
       },
       icon: "rect",
     },
@@ -69,5 +73,11 @@ export default (props: LinesProps) => {
     series,
   };
 
-  return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} theme={theme} />;
+  return (
+    <ChartBox
+      {...restProps}
+      option={option ? merge(opt, option) : opt}
+      theme={theme}
+    />
+  );
 };
