@@ -14,22 +14,22 @@ export default ({ option, theme, styles, ...restProps }: ChartBoxProps) => {
   const [chart, setChart] = useState<echarts.ECharts>();
   const targetRef = useRef();
 
-  const colors = theme === "dark" ? {
-    backgroundColor: "#2c343c",
-    textStyle: {
-      color: "rgba(255, 255, 255, 0.5)",
-    },
-  } : {
-    backgroundColor: "rgba(255, 255, 255, 0)",
-    textStyle: {
-      color: "rgba(0, 0, 0, 0.8)",
-    },
-  }
+  // const colors = theme === "dark" ? {
+  //   backgroundColor: "#2c343c",
+  //   textStyle: {
+  //     color: "rgba(255, 255, 255, 0.5)",
+  //   },
+  // } : {
+  //   backgroundColor: "rgba(255, 255, 255, 0)",
+  //   textStyle: {
+  //     color: "rgba(0, 0, 0, 0.8)",
+  //   },
+  // }
 
   useEffect(() => {
     const myChart = echarts.init(targetRef.current);
     myChart.setOption({
-      ...colors,
+      // ...colors,
       ...option,
     });
     setChart(myChart);
@@ -42,7 +42,7 @@ export default ({ option, theme, styles, ...restProps }: ChartBoxProps) => {
   }, []);
 
   useEffect(() => {
-    if (chart) chart.setOption({...colors, ...option});
+    if (chart) chart.setOption({...option});
   }, [option, theme, chart]);
 
   useEffect(() => {

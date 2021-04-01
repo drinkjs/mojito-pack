@@ -49,14 +49,6 @@
       "default": [
         "25%","90%"
       ]
-    },
-    "theme": {
-      "name": "主题",
-      "type": [
-        "dark",
-        "light"
-      ],
-      "default": "dark"
     }
   },
   "title": "南丁格尔玫瑰图",

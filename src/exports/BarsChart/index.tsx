@@ -45,10 +45,6 @@ export default (props: BarsProps) => {
     },
     legend: {
       data: legend, // ["分类1", "分类2", "分类3"],
-      textStyle: {
-        color:
-          theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
-      },
       icon: "rect",
     },
     xAxis: {

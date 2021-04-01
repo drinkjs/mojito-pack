@@ -48,10 +48,6 @@ export default (props: StackedBarChartProps) => {
     },
     legend: {
       data: legend,
-      textStyle: {
-        color:
-          theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
-      },
     },
     // grid: {
     //   left: "3%",

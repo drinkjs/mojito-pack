@@ -49,11 +49,6 @@
       "type": "object",
       "comment": "Echarts配置，具体参考echarts官网",
       "default": {}
-    },
-    "theme":{
-      "name":"主题",
-      "type":["dark", "light"],
-      "default":"dark"
     }
   },
   "title": "基础柱状图",

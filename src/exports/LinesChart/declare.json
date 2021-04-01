@@ -105,14 +105,6 @@
       "type": "boolean",
       "name": "平滑",
       "default": false
-    },
-    "theme": {
-      "name": "主题",
-      "type": [
-        "dark",
-        "light"
-      ],
-      "default": "dark"
     }
   },
   "title": "多折线图",

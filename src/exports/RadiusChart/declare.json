@@ -50,14 +50,6 @@
         "50%",
         "80%"
       ]
-    },
-    "theme": {
-      "name": "主题",
-      "type": [
-        "dark",
-        "light"
-      ],
-      "default": "dark"
     }
   },
   "title": "基础环形图",
