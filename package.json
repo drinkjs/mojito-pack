@@ -34,13 +34,13 @@
     "zip-webpack-plugin": "^3.0.0"
   },
   "dependencies": {
-    "@types/echarts": "^4.9.3",
     "@types/video.js": "^7.3.11",
     "antd": "^4.12.1",
     "d3-color": "^2.0.0",
     "d3-interpolate": "^2.0.1",
     "d3-scale": "^3.2.3",
     "echarts": "^5.0.0",
+    "echarts-stat": "^1.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "three": "^0.125.2",

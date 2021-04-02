@@ -145,6 +145,8 @@ function startBuild(confs) {
 
     if (stats.hasErrors()) {
       console.error(info.errors);
+      console.log("打包失败");
+      return;
     }
 
     if (buildConfs.length > 0) {
