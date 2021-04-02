@@ -3,9 +3,9 @@
   "props": {
     "src": {
       "type": "image",
+      "name":"图片地址",
       "default": ""
     }
   },
-  "libName": "Image",
   "name": "Image"
 }

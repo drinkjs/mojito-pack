@@ -14,6 +14,7 @@ module.exports = function(webpackConf) {
       "react-dom": "ReactDOM",
       echarts: "echarts",
       antd: "antd",
+      d3: "d3",
       three: "THREE",
       lodash: "_",
     },
