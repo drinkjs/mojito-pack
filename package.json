@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@types/video.js": "^7.3.11",
-    "antd": "^4.12.1",
+    "antd": "^4.15.0",
     "d3": "^6.6.2",
     "d3-color": "^2.0.0",
     "d3-interpolate": "^2.0.1",

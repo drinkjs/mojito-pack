@@ -3,7 +3,7 @@
   "props": {
     "data": {
       "type": "array",
-      "name":"数据",
+      "name": "数据",
       "comment": "图表数据[{name:类型1, value:100}, ...]",
       "default": [
         {
@@ -38,19 +38,19 @@
     },
     "option": {
       "type": "object",
-      "name":"配置",
+      "name": "配置",
       "comment": "Echarts配置，具体参考echarts官网",
       "default": {}
     },
     "smooth": {
-      "type":"boolean",
-      "name":"平滑",
+      "type": "boolean",
+      "name": "平滑",
       "default": false
     },
-    "itemColor":{
-      "name":"线段颜色",
+    "itemColor": {
+      "name": "线段颜色",
       "comment": "如：#FF0000",
-      "type":"string"
+      "type": "string"
     }
   },
   "title": "基础折线图",

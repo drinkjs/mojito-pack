@@ -18,7 +18,7 @@ const extensions = [
 ];
 const declareFile = "declare.json";
 
-const buildFile = ["FunnelChart"];
+const buildFile = [];
 
 // 扫描目录
 const files = fs.readdirSync(exportPath);
@@ -74,6 +74,7 @@ libs.forEach((libName) => {
         library: libName + declare.version,
         libraryTarget: "umd",
         path: path.resolve(__dirname, `dist/${libName}`),
+        crossOriginLoading: "anonymous"
       },
       plugins: [
         new CopyWebpackPlugin({

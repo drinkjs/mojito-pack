@@ -3,7 +3,7 @@
   "props": {
     "data": {
       "type": "array",
-      "name":"数据",
+      "name": "数据",
       "default": [
         {
           "name": "类型1",

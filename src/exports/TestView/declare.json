@@ -8,5 +8,9 @@
   },
   "title": "组件测试",
   "libName": "TestView",
-  "name": "TestView"
+  "name": "TestView",
+  "dependencies": [
+    "https://cdn.staticfile.org/react/17.0.2/umd/react.production.min.js",
+    "https://cdn.staticfile.org/react-dom/17.0.2/umd/react-dom.production.min.js"
+  ]
 }

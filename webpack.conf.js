@@ -10,13 +10,13 @@ module.exports = function(webpackConf) {
     mode: "production",
     entry: "./src/index.js",
     externals: {
-      react: "React",
-      "react-dom": "ReactDOM",
       echarts: "echarts",
-      antd: "antd",
       d3: "d3",
       three: "THREE",
       lodash: "_",
+      react: "React",
+      'react-dom': "ReactDOM",
+      'antd': "antd",
     },
     plugins: [
       new WebpackBar()

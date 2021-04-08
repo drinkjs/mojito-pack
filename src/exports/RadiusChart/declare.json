@@ -3,7 +3,7 @@
   "props": {
     "data": {
       "type": "array",
-      "name":"数据",
+      "name": "数据",
       "comment": "图表数据[{name:类型1, value:100}, ...]",
       "default": [
         {
@@ -38,13 +38,13 @@
     },
     "option": {
       "type": "object",
-      "name":"配置",
+      "name": "配置",
       "comment": "echarts配置，具体参考echarts官网",
       "default": {}
     },
     "radius": {
       "type": "array",
-      "name":"半径",
+      "name": "半径",
       "comment": "内外圆半径",
       "default": [
         "50%",
