@@ -17,6 +17,8 @@ module.exports = function(webpackConf) {
       react: "React",
       'react-dom': "ReactDOM",
       'antd': "antd",
+      'three/examples/jsm/controls/OrbitControls':'THREE',
+      'three/examples/jsm/utils/BufferGeometryUtils':'THREE'
     },
     plugins: [
       new WebpackBar()

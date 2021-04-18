@@ -815,7 +815,10 @@
   },
   "title": "地球",
   "dependencies": [
-    "https://cdn.staticfile.org/three.js/r125/three.min.js"
+    "https://cdn.staticfile.org/three.js/r125/three.min.js",
+    "https://unpkg.com/three@0.125.0/examples/js/controls/OrbitControls.js",
+    "https://unpkg.com/three@0.125.0/examples/js/utils/BufferGeometryUtils.js"
+
   ],
   "name": "Earth"
 }
