@@ -3,6 +3,7 @@
   "props": {
     "text": {
       "type": "string",
+      "name":"文本",
       "default": "请输入文本"
     }
   },

@@ -24,7 +24,7 @@ const colors = [
 const domain = [1000, 3000, 10000, 50000, 100000, 500000, 1000000, 1000000];
 
 interface EarthProps {
-  barData: { lat: number; lng: number; value: number }[];
+  data: { lat: number; lng: number; value: number }[];
   syncPosition?: {
     position: { x: number; y: number; z: number };
     rotation: { x: number; y: number; z: number };
@@ -64,7 +64,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
   }
 
   componentDidUpdate(prevProps: EarthProps) {
-    const { barData, syncPosition } = this.props;
+    const { data, syncPosition } = this.props;
 
     if (
       prevProps.syncPosition !== syncPosition &&
@@ -84,7 +84,7 @@ export default class Earth extends React.PureComponent<EarthProps> {
       return;
     }
 
-    if (JSON.stringify(prevProps.barData) !== JSON.stringify(barData)) {
+    if (JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
       this.pivot.remove(...this.barMeshs);
       this.createBar();
     }
@@ -281,14 +281,14 @@ export default class Earth extends React.PureComponent<EarthProps> {
    */
   createBar() {
     this.barMeshs = [];
-    const { barData } = this.props;
-    if (!barData || barData.length === 0) return;
+    const { data } = this.props;
+    if (!data || data.length === 0) return;
 
     let color;
 
     const scale = d3Scale.scaleLinear().domain(domain).range(colors);
 
-    barData.forEach(({ lat, lng, value: size }) => {
+    data.forEach(({ lat, lng, value: size }) => {
       color = scale(size);
       size = size / 20000;
       const pos = this.convertLatLngToSphereCoords(lat, lng, globeRadius);
