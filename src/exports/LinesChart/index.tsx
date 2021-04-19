@@ -1,7 +1,7 @@
 import * as React from "react";
 import { merge } from "lodash";
+import { Skeleton } from "antd";
 import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
-
 interface ChartData {
   name: string;
   data: { category: string; value: number }[];
@@ -11,13 +11,14 @@ interface ChartData {
 interface LinesProps extends ChartBoxProps {
   data: ChartData[];
   smooth: boolean;
+  dataloading?:boolean
 }
 
 export default (props: LinesProps) => {
-  const { option, data, smooth, theme, ...restProps } = props;
+  const { option, data, smooth, theme, dataloading, ...restProps } = props;
   const _data = data || [];
 
-  const legend: string[] = []; 
+  const legend: string[] = [];
   const series: any = [];
   let xData: string[] = [];
 
@@ -70,10 +71,12 @@ export default (props: LinesProps) => {
   };
 
   return (
-    <ChartBox
-      {...restProps}
-      option={option ? merge(opt, option) : opt}
-      theme={theme}
-    />
+    <Skeleton active loading={dataloading}>
+      <ChartBox
+        {...restProps}
+        option={option ? merge(opt, option) : opt}
+        theme={theme}
+      />
+    </Skeleton>
   );
 };

@@ -1,10 +1,43 @@
 import React from "react";
 import Chart from "./index";
+const data = require("./data.json");
 
 export default {
   title: "Echarts/多折线图",
   component: Chart,
 };
+const cases = {
+  name:"新增确诊",
+  data: []
+}
+const deaths = {
+  name:"新增死亡",
+  data: []
+}
+const recovered = {
+  name:"新增康复",
+  data: []
+}
+const objKeys = Object.keys(data.cases);
+objKeys.forEach((key, i)=>{
+  if(i > 0){
+    cases.data.push({
+      category: key,
+      value: (data.cases[key] - data.cases[objKeys[i-1]]) / 1000
+    });
+    deaths.data.push({
+      category: key,
+      value: (data.deaths[key] - data.deaths[objKeys[i-1]]) / 1000
+    });
+    recovered.data.push({
+      category: key,
+      value: (data.recovered[key] - data.recovered[objKeys[i-1]]) / 1000
+    })
+  }
+});
+
+const chartData = [cases, recovered, deaths];
+
 
 const Template = (args) => <Chart {...args} />;
 
@@ -14,96 +47,7 @@ Primary.args = {
     width: "500px",
     height: "300px",
   },
-  data: [
-    {
-      name: "新增",
-      data: [
-        {
-          category: "2/15",
-          value: 22,
-        },
-        {
-          category: "2/16",
-          value: 50,
-        },
-        {
-          category: "2/17",
-          value: 100,
-        },
-        {
-          category: "2/18",
-          value: 120,
-        },
-        {
-          category: "2/19",
-          value: 67,
-        },
-        {
-          category: "2/20",
-          value: 55,
-        },
-      ],
-      color: "#FF0000",
-    },
-    {
-      name: "死亡",
-      data: [
-        {
-          category: "2/15",
-          value: 200,
-        },
-        {
-          category: "2/16",
-          value: 121,
-        },
-        {
-          category: "2/17",
-          value: 121,
-        },
-        {
-          category: "2/18",
-          value: 222,
-        },
-        {
-          category: "2/19",
-          value: 222,
-        },
-        {
-          category: "2/20",
-          value: 1111,
-        },
-      ],
-    },
-    {
-      name: "康复",
-      data: [
-        {
-          category: "2/15",
-          value: 11,
-        },
-        {
-          category: "2/16",
-          value: 42,
-        },
-        {
-          category: "2/17",
-          value: 140,
-        },
-        {
-          category: "2/18",
-          value: 200,
-        },
-        {
-          category: "2/19",
-          value: 66,
-        },
-        {
-          category: "2/20",
-          value: 57,
-        },
-      ],
-    },
-  ],
+  data: chartData,
   smooth: true,
   theme: "dark",
 };

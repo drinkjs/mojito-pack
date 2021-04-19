@@ -1,0 +1,69 @@
+{
+  "version": "v1.0.0",
+  "title":"多条形图",
+  "props": {
+    "data": {
+      "type": "array",
+      "name": "数据",
+      "default": [
+        {
+          "name": "世界人口",
+          "data": [
+            {
+              "category": "2011年",
+              "value": 630230
+            },
+            {
+              "category": "2012年",
+              "value": 681807
+            }
+          ]
+        },
+        {
+          "name": "中国",
+          "data": [
+            {
+              "category": "2011年",
+              "value": 131744
+            },
+            {
+              "category": "2012年",
+              "value": 134141
+            }
+          ]
+        },
+        {
+          "name": "印度",
+          "data": [
+            {
+              "category": "2011年",
+              "value": 104970
+            },
+            {
+              "category": "2012年",
+              "value": 121594
+            }
+          ]
+        }
+      ]
+    },
+    "itemColors": {
+      "type": "array",
+      "name": "颜色",
+      "default": {
+        "2011年": "#003a8c",
+        "2012年": "#006d75"
+      }
+    },
+    "option": {
+      "type": "object",
+      "name": "配置",
+      "comment": "echarts配置，具体参考echarts官网"
+    }
+  },
+  "dependencies": [
+    "https://cdn.staticfile.org/echarts/5.0.2/echarts.min.js",
+    "https://cdn.staticfile.org/lodash.js/4.17.20/lodash.min.js"
+  ],
+  "name": "RowsBarChart"
+}
