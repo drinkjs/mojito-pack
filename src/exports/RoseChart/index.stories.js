@@ -2,6 +2,9 @@ import React from 'react';
 import PieChart from './index'
 
 const conf = require("./declare.json")
+const data = require("./data.json")
+
+const chartData = data.map(v => ({name:v.state, value: v.cases}))
 
 export default {
   title: 'Echarts/南丁格尔玫瑰图',
@@ -16,6 +19,6 @@ Primary.args = {
     width:"500px",
     height:"300px"
   },
-  data: conf.props.data.default,
+  data: chartData,
   theme: "dark",
 };

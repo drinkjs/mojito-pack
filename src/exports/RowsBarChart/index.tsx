@@ -15,7 +15,6 @@ interface ItemColor {
 
 interface Props extends ChartBoxProps {
   data: ChartData[];
-  dataloading?: boolean;
   itemColors?: ItemColor;
 }
 

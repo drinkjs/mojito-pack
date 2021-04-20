@@ -18,7 +18,7 @@ const extensions = [
 ];
 const declareFile = "declare.json";
 
-const buildFile = ["RowsBarChart", "LinesChart"];
+const buildFile = [];
 
 // 扫描目录
 const files = fs.readdirSync(exportPath);

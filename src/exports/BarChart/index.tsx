@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as echarts from "echarts";
 import { merge } from "lodash";
+import { Skeleton } from "antd";
 import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
@@ -18,10 +19,17 @@ export default (props: BarProps) => {
     data,
     option,
     itemColors = ["#ff0000", "#330000"],
+    dataloading,
     ...restProps
   } = props;
   const _data = data || [];
   const opt = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+    },
     xAxis: {
       type: "category",
       data: _data.map((v) => v.name),
@@ -51,5 +59,5 @@ export default (props: BarProps) => {
       },
     ],
   };
-  return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} />;
+  return <Skeleton active loading={dataloading}><ChartBox {...restProps} option={option ? merge(opt, option) : opt} /></Skeleton>;
 };

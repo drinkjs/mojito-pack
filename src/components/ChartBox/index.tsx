@@ -7,7 +7,8 @@ export interface ChartBoxProps {
   option?: any;
   styles?: React.CSSProperties;
   className?: string;
-  theme?:"dark"|"light"
+  theme?:"dark"|"light";
+  dataloading?:boolean;
 }
 
 export default ({ option, theme, styles, ...restProps }: ChartBoxProps) => {

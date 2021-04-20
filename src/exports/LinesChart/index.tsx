@@ -11,7 +11,6 @@ interface ChartData {
 interface LinesProps extends ChartBoxProps {
   data: ChartData[];
   smooth: boolean;
-  dataloading?:boolean
 }
 
 export default (props: LinesProps) => {

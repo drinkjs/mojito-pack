@@ -2,6 +2,9 @@ import React from 'react';
 import Chart from './index'
 
 const conf = require("./declare.json")
+const data = require("./data.json")
+
+const chartData = Object.keys(data).map(key => ({name:key, value: data[key]}))
 
 export default {
   title: 'Echarts/折线图',
@@ -16,8 +19,18 @@ Primary.args = {
     width:"500px",
     height:"300px"
   },
-  data: conf.props.data.default,
+  data: chartData,
   smooth: true,
   theme: "dark",
-  itemColor:"#ff0000"
+  itemColor:"#ff0000",
+  option: {
+    series: [
+      {
+        showSymbol: false,
+      //   areaStyle: {
+      //     color:"#ff0000"
+      // },
+      }
+    ]
+  }
 };

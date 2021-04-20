@@ -1,5 +1,6 @@
 import * as React from "react";
 import { merge } from "lodash";
+import { Skeleton } from "antd";
 import ChartBox, { ChartBoxProps } from "../../components/ChartBox";
 
 interface ChartData {
@@ -14,7 +15,7 @@ interface LineChartProps extends ChartBoxProps {
 }
 
 export default (props: LineChartProps) => {
-  const { option, data, smooth, itemColor, ...restProps } = props;
+  const { option, data, smooth, itemColor, dataloading, ...restProps } = props;
   const _data = data || [];
 
   const opt = {
@@ -50,5 +51,5 @@ export default (props: LineChartProps) => {
     ],
   };
 
-  return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} />;
+  return <Skeleton active loading={dataloading}><ChartBox {...restProps} option={option ? merge(opt, option) : opt} /></Skeleton>;
 };

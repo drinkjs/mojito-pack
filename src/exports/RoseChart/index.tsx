@@ -35,6 +35,13 @@ export default (props: Props) => {
         center: ["50%", "50%"],
         selectedMode: "single",
         data: _data,
+        labelLine: {
+          show: false
+        },
+        label: {
+          show: false,
+          position: 'center'
+        },
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
@@ -44,7 +51,6 @@ export default (props: Props) => {
         },
       },
     ],
-    ...option,
   };
 
   return <ChartBox {...restProps} option={option ? merge(opt, option) : opt} />;
