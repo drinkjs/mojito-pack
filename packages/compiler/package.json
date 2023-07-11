@@ -1,0 +1,42 @@
+{
+  "name": "@mojito/compiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist",
+    "LICENSE"
+  ],
+  "bin": {
+    "mojito": "./bin/index.js"
+  },
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jsdom": "^21.1.1",
+    "@types/yargs": "^17.0.24",
+    "clean-webpack-plugin": "^4.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.26.0",
+    "ts-loader": "^9.4.4",
+    "ts-morph": "^19.0.0",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.9.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "16.18.38",
+    "rollup-plugin-dts": "^5.3.0",
+    "tslib": "^2.6.0"
+  }
+}

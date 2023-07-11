@@ -1,53 +1,5 @@
 {
-  "name": "mojito-compack",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "start-storybook -p 6006 -s ./resources --no-dll --no-manager-cache",
-    "build-storybook": "build-storybook --no-dll",
-    "build-webpack": "webpack --config webpack.conf.js --progress --colors --display-modules",
-    "build": "node build.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@storybook/addon-actions": "^6.0.28",
-    "@storybook/addon-essentials": "^6.0.28",
-    "@storybook/addon-links": "^6.0.28",
-    "@storybook/react": "^6.0.28",
-    "@types/d3": "^6.3.0",
-    "@types/lodash": "^4.14.165",
-    "babel-loader": "^8.1.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^6.2.1",
-    "css-loader": "^5.0.1",
-    "less": "^3.12.2",
-    "less-loader": "^5.0.0",
-    "react-is": "^17.0.1",
-    "style-loader": "^2.0.0",
-    "url-loader": "^4.1.1",
-    "webpack-cli": "^3.1.0",
-    "webpack-merge": "^5.4.0",
-    "zip-webpack-plugin": "^3.0.0"
-  },
-  "dependencies": {
-    "@types/video.js": "^7.3.11",
-    "antd": "^4.15.0",
-    "d3": "^6.6.2",
-    "d3-color": "^2.0.0",
-    "d3-interpolate": "^2.0.1",
-    "d3-scale": "^3.2.3",
-    "echarts": "^5.0.0",
-    "echarts-stat": "^1.2.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "three": "^0.125.2",
-    "ts-loader": "^8.0.10",
-    "typescript": "^4.0.5",
-    "webpackbar": "^5.0.0-3"
-  }
+	"dependencies": {
+		"typescript": "^5.1.6"
+	}
 }

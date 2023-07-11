@@ -1,0 +1,25 @@
+{
+  "name": "mojito-echarts",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "mojito",
+    "dev": "mojito --dev"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@mojito/compiler": "workspace:^",
+    "@mojito/react-pack": "workspace:^",
+    "@types/lodash-es": "^4.17.7",
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4"
+  },
+  "dependencies": {
+    "echarts": "^5.4.2",
+    "lodash-es": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
