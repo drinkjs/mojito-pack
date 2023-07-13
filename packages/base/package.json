@@ -1,0 +1,23 @@
+{
+  "name": "mojito-base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "mojito",
+    "dev": "mojito --dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mojito/compiler": "workspace:^",
+    "@mojito/react-pack": "workspace:^",
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
+    "antd": "^5.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.1.6"
+  }
+}

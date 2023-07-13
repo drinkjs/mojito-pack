@@ -8,6 +8,14 @@ const PROPS = Symbol();
 const ID = Symbol();
 const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 
+export interface MojitoComponentProps {
+	$syncData?:Record<string, any>,
+	$display:"editor"|"viewer",
+	$style?:React.CSSProperties,
+	$setProps:(props:Record<string, any>)=>void,
+	$setStyle:(style:React.CSSProperties)=>void,
+}
+
 export type ComponentProps = {
 	name: string;
 	type: "string" | "number" | "boolean" | "object" | "array";

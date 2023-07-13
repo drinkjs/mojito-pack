@@ -5,12 +5,12 @@ import covid19 from "./data/covid2019.json";
 import Global from "./Global";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { throttle } from "./common/util";
+import { MojitoComponentProps } from "@mojito/react-pack";
 
 type XYZ = { x: number; y: number; z: number };
 
-interface EarthProps {
+interface EarthProps extends MojitoComponentProps {
 	data: { lat: string; lng: string; value: number }[];
-	syncData?:any,
 	onControl?: (params: { cp: XYZ; cr: XYZ; gp: XYZ; gr: XYZ }) => void;
 }
 
@@ -20,14 +20,14 @@ const defaultData = covid19.map(({ coordinates, stats }) => ({
 	value: stats.confirmed,
 }));
 
-export default function Earth({ data = defaultData, onControl, syncData }: EarthProps) {
+export default function Earth({ data = defaultData, onControl, $syncData }: EarthProps) {
 	const [isControl, setIsControl] = useState(false);
 	const controlRef = useRef<any>();
 	const groupRef = useRef<THREE.Group | null>(null);
 
 	useEffect(()=>{
-		if(syncData && syncData.onControl){
-			const {cp, cr, gp, gr} = syncData.onControl;
+		if($syncData && $syncData.onControl){
+			const {cp, cr, gp, gr} = $syncData.onControl;
 			if(groupRef.current){
 				groupRef.current.position.set(gp.x, gp.y, gp.z);
 				groupRef.current.rotation.set(gr.x, gr.y, gr.z);
@@ -39,7 +39,7 @@ export default function Earth({ data = defaultData, onControl, syncData }: Earth
 			}
 
 		}
-	}, [syncData])
+	}, [$syncData])
 
 	const startHandler = useCallback(() => {
 		setIsControl(true);

@@ -1,0 +1,1 @@
+{"name":"mojito-base","version":"1.0.0","external":{},"components":[{"export":"Image","name":"图片"},{"export":"Text","name":"文本"}]}
