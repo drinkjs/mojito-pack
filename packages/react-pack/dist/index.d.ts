@@ -1,8 +1,8 @@
 import ReactDOM from "react-dom/client";
-declare const rootSym: unique symbol;
-declare const evenerSym: unique symbol;
-declare const propsSym: unique symbol;
-declare const idSym: unique symbol;
+declare const ROOT: unique symbol;
+declare const EVENTER: unique symbol;
+declare const PROPS: unique symbol;
+declare const ID: unique symbol;
 export type ComponentProps = {
     name: string;
     type: "string" | "number" | "boolean" | "object" | "array";
@@ -14,13 +14,17 @@ export type ComponentInfo = {
     cover?: string;
     version?: string;
     props?: Record<string, ComponentProps>;
+    events?: Record<string, {
+        name?: string;
+        description?: string;
+    }>;
     deps?: Record<string, string>;
 };
 export interface MojitoComponent<T> {
-    [rootSym]: null | ReactDOM.Root;
-    [evenerSym]: null | EventTarget;
-    [propsSym]?: any;
-    [idSym]: string;
+    [ROOT]: null | ReactDOM.Root;
+    [EVENTER]: null | EventTarget;
+    [PROPS]?: any;
+    [ID]: string;
     framework?: {
         name: "react" | "vue";
         version: string;
@@ -31,7 +35,8 @@ export interface MojitoComponent<T> {
     unmount(): void;
     setProps(newProps: any): void;
     getProps(): Record<string, any>;
-    getId(): string;
+    getComponentId(): string;
+    setEvent(eventName: string, callback: (...args: any[]) => any): any;
 }
 export declare function CreatePack<T extends object>(component: T, componentInfo: ComponentInfo): MojitoComponent<T>;
 export {};

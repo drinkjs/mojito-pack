@@ -1,0 +1,1 @@
+{"name":"mojito-earth","version":"1.0.0","external":{"THREE":"https://unpkg.com/three@0.154.0/build/three.min.js","react":"https://unpkg.com/react@18/umd/react.production.min.js","react-dom":"https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"},"components":[{"export":"PackEarth","name":"地球"}]}

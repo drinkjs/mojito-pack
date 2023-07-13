@@ -31,13 +31,13 @@ function parseExternals(configExternals: any) {
 		);
 	} else if (typeof confExternals === "object") {
 		for (const key in confExternals) {
-			if (!Array.isArray(confExternals[key]) || confExternals[key].length < 2) {
+			if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
 				throw new Error(
-					"请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}"
+					"请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}"
 				);
 			}
-			externals[key] = confExternals[key][1];
-			cdn[key] = confExternals[key][0];
+			externals[key] = confExternals[key][1] || key;
+			cdn[externals[key]] = confExternals[key][0];
 		}
 	}
 	return { externals, cdn };
@@ -115,7 +115,6 @@ function parseEntry(entry: string | string[]) {
 			returnPropertys.includes("mount") &&
 			returnPropertys.includes("unmount") &&
 			returnPropertys.includes("component") &&
-			returnPropertys.includes("getId") &&
 			returnPropertys.includes("setProps") &&
 			returnPropertys.includes("getProps")
 		) {

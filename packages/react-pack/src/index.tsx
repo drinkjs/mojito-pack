@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from 'nanoid'
 
-const rootSym = Symbol();
-const evenerSym = Symbol();
-const propsSym = Symbol();
-const idSym = Symbol();
-const UPDATE_PROPS = "__UPDATE_PROPS__";
+const ROOT = Symbol();
+const EVENTER = Symbol();
+const PROPS = Symbol();
+const ID = Symbol();
+const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 
 export type ComponentProps = {
 	name: string;
@@ -20,14 +20,18 @@ export type ComponentInfo = {
 	cover?:string,
 	version?: string;
 	props?: Record<string, ComponentProps>
+	events?:Record<string, {
+		name?:string,
+		description?:string
+	}>,
 	deps?: Record<string, string>,
 };
 
 export interface MojitoComponent<T> {
-  [rootSym]:null | ReactDOM.Root,
-  [evenerSym]:null | EventTarget,
-	[propsSym]?:any,
-	[idSym]:string
+  [ROOT]:null | ReactDOM.Root,
+  [EVENTER]:null | EventTarget,
+	[PROPS]?:any,
+	[ID]:string
 	framework?:{
 		name:"react"|"vue",
 		version:string
@@ -38,7 +42,8 @@ export interface MojitoComponent<T> {
   unmount():void
   setProps(newProps:any):void
 	getProps():Record<string, any>
-	getId():string
+	getComponentId():string
+	setEvent(eventName:string, callback:(...args:any[])=>any):any
 }
 
 export function CreatePack<T extends object>(component:T,componentInfo:ComponentInfo): MojitoComponent<T> {
@@ -49,37 +54,40 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
 			name:"react",
 			version:React.version
 		},
-		[rootSym]: null,
-		[evenerSym]: null,
-		[idSym]:nanoid(),
+		[ROOT]: null,
+		[EVENTER]: null,
+		[ID]:nanoid(),
 		mount(container: Element | DocumentFragment, props?: any) {
       const eventer = new EventTarget();
 			const client = ReactDOM.createRoot(container);
-			this[rootSym]= client;
-      this[evenerSym] = eventer;
-			this[propsSym] = props;
+			this[ROOT]= client;
+      this[EVENTER] = eventer;
+			this[PROPS] = props;
 			client.render(
-				<App component={this.component} props={props} evener={this[evenerSym]} />
+				<App component={this.component} props={props} evener={this[EVENTER]} />
 			);
 		},
 		unmount() {
-      if(this[rootSym]){
-        this[rootSym].unmount();
-				this[rootSym] = null;
-        this[evenerSym] = null;
+      if(this[ROOT]){
+        this[ROOT].unmount();
+				this[ROOT] = null;
+        this[EVENTER] = null;
       }
 		},
 		setProps(newProps: any) {
-      if(this[evenerSym]){
-				this[propsSym] = newProps;
-			  this[evenerSym].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
+      if(this[EVENTER]){
+				this[PROPS] = newProps;
+			  this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
       }
 		},
-		getProps(){
-			return this[propsSym];
+		setEvent(eventName:string, callback:(...args:any[])=>any, thisArg?:any){
+			this.setProps({[eventName]:callback.bind(thisArg)});
 		},
-		getId(){
-			return this[idSym]
+		getProps(){
+			return this[PROPS];
+		},
+		getComponentId(){
+			return this[ID]
 		}
 	};
 }

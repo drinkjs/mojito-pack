@@ -27,11 +27,6 @@ const args = yargs.argv as any;
 const { dev, port, config } = args;
 const configFile = `${process.cwd()}/${config}`;
 const conf = require(configFile);
-if (!conf.output) {
-	conf.output = {};
-}
-const outPath = conf.output.path ? `${process.cwd()}/${conf.output.path}` : `${process.cwd()}/dist`;
-conf.output.path = outPath;
 
 if (dev) {
 	devServer({ ...conf, devServer: { port, ...conf.devServer } });

@@ -16,6 +16,12 @@ export default (config:webpack.Configuration, pkg:any, isDev?:boolean):webpack.C
     entry = {...config.entry, main} 
   }
 
+  if (!config.output) {
+    config.output = {};
+  }
+  const outPath = config.output.path ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}` : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
+  config.output.path = outPath;
+
   const baseConfig: webpack.Configuration = {
     entry,
     mode: isDev ? "development" : "production",
@@ -28,8 +34,8 @@ export default (config:webpack.Configuration, pkg:any, isDev?:boolean):webpack.C
       libraryTarget: "system",
       crossOriginLoading: "anonymous",
       publicPath: '',
-      filename: `${pkg.name}-${pkg.version}.js`,
-      chunkFilename:`${pkg.name}-${pkg.version}.[name].js`
+      filename: `${pkg.name}.js`,
+      chunkFilename:`${pkg.name}.[name].js`
     },
     watchOptions: {
       aggregateTimeout: 800,

@@ -53,6 +53,11 @@ var webpackConfig = (config, pkg, isDev) => {
         let main = `${process.cwd()}/${config.entry.main}`;
         entry = Object.assign(Object.assign({}, config.entry), { main });
     }
+    if (!config.output) {
+        config.output = {};
+    }
+    const outPath = config.output.path ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}` : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
+    config.output.path = outPath;
     const baseConfig = {
         entry,
         mode: isDev ? "development" : "production",
@@ -65,8 +70,8 @@ var webpackConfig = (config, pkg, isDev) => {
             libraryTarget: "system",
             crossOriginLoading: "anonymous",
             publicPath: '',
-            filename: `${pkg.name}-${pkg.version}.js`,
-            chunkFilename: `${pkg.name}-${pkg.version}.[name].js`
+            filename: `${pkg.name}.js`,
+            chunkFilename: `${pkg.name}.[name].js`
         },
         watchOptions: {
             aggregateTimeout: 800,
@@ -133,11 +138,11 @@ function parseExternals(configExternals) {
     }
     else if (typeof confExternals === "object") {
         for (const key in confExternals) {
-            if (!Array.isArray(confExternals[key]) || confExternals[key].length < 2) {
-                throw new Error("请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}");
+            if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
+                throw new Error("请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}");
             }
-            externals[key] = confExternals[key][1];
-            cdn[key] = confExternals[key][0];
+            externals[key] = confExternals[key][1] || key;
+            cdn[externals[key]] = confExternals[key][0];
         }
     }
     return { externals, cdn };
@@ -208,7 +213,6 @@ function parseEntry(entry) {
             returnPropertys.includes("mount") &&
             returnPropertys.includes("unmount") &&
             returnPropertys.includes("component") &&
-            returnPropertys.includes("getId") &&
             returnPropertys.includes("setProps") &&
             returnPropertys.includes("getProps")) {
             // 确定是createPack调用， 获取createPack的两个参数
@@ -256,7 +260,7 @@ function createCompiler(config, isDev) {
         config.externals = externalInfo.externals;
     }
     const conf = webpackConfig(config, pkg, isDev);
-    conf.entry = `./.entry.ts`;
+    conf.entry = `./entry.ts`;
     const exportComponents = createEntry(allComponents, conf.entry, true);
     const compiler = webpack(conf);
     // 构建memfs文件系统
@@ -433,11 +437,6 @@ const args = yargs.argv;
 const { dev, port, config } = args;
 const configFile = `${process.cwd()}/${config}`;
 const conf = require(configFile);
-if (!conf.output) {
-    conf.output = {};
-}
-const outPath = conf.output.path ? `${process.cwd()}/${conf.output.path}` : `${process.cwd()}/dist`;
-conf.output.path = outPath;
 if (dev) {
     devServer(Object.assign(Object.assign({}, conf), { devServer: Object.assign({ port }, conf.devServer) }));
 }

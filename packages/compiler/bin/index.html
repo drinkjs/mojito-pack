@@ -14,10 +14,10 @@
 
 const sys = new System.constructor();
 sys.addImportMap({
-  "imports": {"react":"https://unpkg.com/react@18/umd/react.production.min.js","react-dom":"https://unpkg.com/react-dom@18/umd/react-dom.production.min.js","echarts":"https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.2/echarts.min.js"}
+  "imports": {}
 })
 
-sys.import("./mojito-echarts-1.0.1.js").then((data)=>{
+sys.import("./mojito-earth.js").then((data)=>{
   console.log(data);
 
   for(const key in data){

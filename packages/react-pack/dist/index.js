@@ -2,11 +2,11 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from 'nanoid';
-const rootSym = Symbol();
-const evenerSym = Symbol();
-const propsSym = Symbol();
-const idSym = Symbol();
-const UPDATE_PROPS = "__UPDATE_PROPS__";
+const ROOT = Symbol();
+const EVENTER = Symbol();
+const PROPS = Symbol();
+const ID = Symbol();
+const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 export function CreatePack(component, componentInfo) {
     return {
         component,
@@ -15,35 +15,38 @@ export function CreatePack(component, componentInfo) {
             name: "react",
             version: React.version
         },
-        [rootSym]: null,
-        [evenerSym]: null,
-        [idSym]: nanoid(),
+        [ROOT]: null,
+        [EVENTER]: null,
+        [ID]: nanoid(),
         mount(container, props) {
             const eventer = new EventTarget();
             const client = ReactDOM.createRoot(container);
-            this[rootSym] = client;
-            this[evenerSym] = eventer;
-            this[propsSym] = props;
-            client.render(_jsx(App, { component: this.component, props: props, evener: this[evenerSym] }));
+            this[ROOT] = client;
+            this[EVENTER] = eventer;
+            this[PROPS] = props;
+            client.render(_jsx(App, { component: this.component, props: props, evener: this[EVENTER] }));
         },
         unmount() {
-            if (this[rootSym]) {
-                this[rootSym].unmount();
-                this[rootSym] = null;
-                this[evenerSym] = null;
+            if (this[ROOT]) {
+                this[ROOT].unmount();
+                this[ROOT] = null;
+                this[EVENTER] = null;
             }
         },
         setProps(newProps) {
-            if (this[evenerSym]) {
-                this[propsSym] = newProps;
-                this[evenerSym].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
+            if (this[EVENTER]) {
+                this[PROPS] = newProps;
+                this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
             }
         },
-        getProps() {
-            return this[propsSym];
+        setEvent(eventName, callback, thisArg) {
+            this.setProps({ [eventName]: callback.bind(thisArg) });
         },
-        getId() {
-            return this[idSym];
+        getProps() {
+            return this[PROPS];
+        },
+        getComponentId() {
+            return this[ID];
         }
     };
 }
