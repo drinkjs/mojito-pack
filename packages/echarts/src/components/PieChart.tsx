@@ -20,6 +20,7 @@ function PieChart({
 }: PieCharProps) {
 	const opts = useMemo(() => {
 		const opt = {
+      backgroundColor:"transparent",
       tooltip: {
         trigger: "item",
       },
@@ -60,7 +61,7 @@ function PieChart({
 export default CreatePack(
 	PieChart,
 	{
-		name: "基础散点图",
+		name: "基础饼图",
 		props: {
 			data:{
 				name: "数据",

@@ -56,6 +56,15 @@ export default function Global({data, isPause, gref}: EarthProps){
     if(groupRef.current && !isPause){
       groupRef.current.rotation.y += 0.001;
     }
+    if (!state.gl.domElement?.parentElement) return
+
+    const { clientWidth, clientHeight } = state.gl.domElement.parentElement
+    if (
+      state.size.width !== clientWidth &&
+      state.size.height !== clientHeight
+    ) {
+      state.setSize(clientWidth, clientHeight)
+    }
   });
 
   useImperativeHandle(

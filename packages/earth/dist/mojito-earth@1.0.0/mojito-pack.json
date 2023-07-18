@@ -1,1 +1,1 @@
-{"name":"mojito-earth","version":"1.0.0","external":{},"components":[{"export":"PackEarth","name":"地球"}]}
+{"name":"mojito-earth","version":"1.0.0","external":{},"components":[{"export":"PackEarth","name":"点阵地球"}]}

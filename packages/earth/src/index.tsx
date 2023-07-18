@@ -67,14 +67,16 @@ export default function Earth({ data = defaultData, onControl, $syncData }: Eart
 	);
 
 	return (
-		<Canvas camera={{ far: 4000, fov: 45, near: 1, position: [0, 0, 500] }}>
-			<OrbitControls
-				onStart={startHandler}
-				onEnd={endHandler}
-				onChange={changeHandler}
-				ref={controlRef}
-			/>
-			<Global data={defaultData} isPause={isControl} gref={groupRef} />
-		</Canvas>
+		<div style={{width:"100%", height:"100%", display:"flex", justifyContent:"center", alignItems:"center"}}>
+			<Canvas camera={{ far: 4000, fov: 45, near: 1, position: [0, 0, 500] }}>
+				<OrbitControls
+					onStart={startHandler}
+					onEnd={endHandler}
+					onChange={changeHandler}
+					ref={controlRef}
+				/>
+				<Global data={defaultData} isPause={isControl} gref={groupRef} />
+			</Canvas>
+		</div>
 	);
 }

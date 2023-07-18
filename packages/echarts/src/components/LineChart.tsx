@@ -22,6 +22,7 @@ function LineChart({
 }: LinehartProps) {
 	const opts = useMemo(() => {
 		const opt = {
+			backgroundColor:"transparent",
 			tooltip: {
 				trigger: "axis",
 			},
@@ -66,7 +67,7 @@ function LineChart({
 export default CreatePack(
 	LineChart,
 	{
-		name: "基础拆线图",
+		name: "基础折线图",
 		props: {
 			data:{
 				name: "数据",

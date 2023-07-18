@@ -19,6 +19,7 @@ function ScatterChart({
 }: ScatterChartProps) {
 	const opts = useMemo(() => {
 		const opt = {
+      backgroundColor:"transparent",
       xAxis: {},
       yAxis: {},
       series: [

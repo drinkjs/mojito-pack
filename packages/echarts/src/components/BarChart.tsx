@@ -21,6 +21,7 @@ function BarChart({
 }: BarChartProps) {
 	const opts = useMemo(() => {
 		const opt = {
+			backgroundColor:"transparent",
 			tooltip: {
 				trigger: "axis",
 				axisPointer: {

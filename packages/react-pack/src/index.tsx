@@ -71,9 +71,9 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
 			const client = ReactDOM.createRoot(container);
 			this[ROOT]= client;
       this[EVENTER] = eventer;
-			this[PROPS] = props;
+			this[PROPS] = {...this.getDefaultProps(), ...props};
 			client.render(
-				<App component={this.component} props={{...this.getDefaultProps(), ...props}} evener={this[EVENTER]} />
+				<App component={this.component} props={this[PROPS]} evener={this[EVENTER]} />
 			);
 		},
 		unmount() {
