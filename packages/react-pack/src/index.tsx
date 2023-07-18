@@ -50,6 +50,7 @@ export interface MojitoComponent<T> {
   unmount():void
   setProps(newProps:any):void
 	getProps():Record<string, any>
+	getDefaultProps():Record<string, any> | undefined
 	getComponentId():string
 	setEvent(eventName:string, callback:(...args:any[])=>any):any
 }
@@ -72,7 +73,7 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
       this[EVENTER] = eventer;
 			this[PROPS] = props;
 			client.render(
-				<App component={this.component} props={props} evener={this[EVENTER]} />
+				<App component={this.component} props={{...this.getDefaultProps(), ...props}} evener={this[EVENTER]} />
 			);
 		},
 		unmount() {
@@ -84,8 +85,9 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
 		},
 		setProps(newProps: any) {
       if(this[EVENTER]){
-				this[PROPS] = newProps;
-			  this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
+				const oldProps = this[PROPS];
+				this[PROPS] = {...oldProps, ...newProps};
+			  this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, this[PROPS]));
       }
 		},
 		setEvent(eventName:string, callback:(...args:any[])=>any, thisArg?:any){
@@ -93,6 +95,20 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
 		},
 		getProps(){
 			return this[PROPS];
+		},
+		getDefaultProps(){
+			let defaultProps:any;
+			if(this.componentInfo.props){
+				for(const key in this.componentInfo.props){
+					if(this.componentInfo.props[key].default){
+						if(!defaultProps){
+							defaultProps = {}
+						}
+						defaultProps[key] = this.componentInfo.props[key].default
+					}
+				}
+			}
+			return defaultProps
 		},
 		getComponentId(){
 			return this[ID]
@@ -116,7 +132,7 @@ const App: React.FC<{ component: any; props?: any; evener: EventTarget }> = ({
 	const [currProps, setCurrProps] = useState(props);
 	useEffect(() => {
 		const callback = ({ data }: AppEvent) => {
-			setCurrProps({ ...data });
+			setCurrProps(data);
 		};
 		evener.addEventListener(UPDATE_PROPS, callback);
 		return () => evener.removeEventListener(UPDATE_PROPS, callback);

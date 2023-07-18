@@ -24,7 +24,7 @@ export function CreatePack(component, componentInfo) {
             this[ROOT] = client;
             this[EVENTER] = eventer;
             this[PROPS] = props;
-            client.render(_jsx(App, { component: this.component, props: props, evener: this[EVENTER] }));
+            client.render(_jsx(App, { component: this.component, props: Object.assign(Object.assign({}, this.getDefaultProps()), props), evener: this[EVENTER] }));
         },
         unmount() {
             if (this[ROOT]) {
@@ -35,8 +35,9 @@ export function CreatePack(component, componentInfo) {
         },
         setProps(newProps) {
             if (this[EVENTER]) {
-                this[PROPS] = newProps;
-                this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, newProps));
+                const oldProps = this[PROPS];
+                this[PROPS] = Object.assign(Object.assign({}, oldProps), newProps);
+                this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, this[PROPS]));
             }
         },
         setEvent(eventName, callback, thisArg) {
@@ -44,6 +45,20 @@ export function CreatePack(component, componentInfo) {
         },
         getProps() {
             return this[PROPS];
+        },
+        getDefaultProps() {
+            let defaultProps;
+            if (this.componentInfo.props) {
+                for (const key in this.componentInfo.props) {
+                    if (this.componentInfo.props[key].default) {
+                        if (!defaultProps) {
+                            defaultProps = {};
+                        }
+                        defaultProps[key] = this.componentInfo.props[key].default;
+                    }
+                }
+            }
+            return defaultProps;
         },
         getComponentId() {
             return this[ID];
@@ -60,7 +75,7 @@ const App = ({ component: Comp, props, evener, }) => {
     const [currProps, setCurrProps] = useState(props);
     useEffect(() => {
         const callback = ({ data }) => {
-            setCurrProps(Object.assign({}, data));
+            setCurrProps(data);
         };
         evener.addEventListener(UPDATE_PROPS, callback);
         return () => evener.removeEventListener(UPDATE_PROPS, callback);

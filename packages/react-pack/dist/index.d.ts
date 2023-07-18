@@ -43,6 +43,7 @@ export interface MojitoComponent<T> {
     unmount(): void;
     setProps(newProps: any): void;
     getProps(): Record<string, any>;
+    getDefaultProps(): Record<string, any> | undefined;
     getComponentId(): string;
     setEvent(eventName: string, callback: (...args: any[]) => any): any;
 }

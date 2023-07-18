@@ -71,7 +71,7 @@ var webpackConfig = (config, pkg, isDev) => {
             clean: true,
             libraryTarget: "system",
             crossOriginLoading: "anonymous",
-            publicPath: '',
+            publicPath: `${config.output.publicPath || "/public"}/${pkg.name}@${pkg.version}/`,
             filename: `${pkg.name}.js`,
             chunkFilename: `${pkg.name}.[name].js`
         },

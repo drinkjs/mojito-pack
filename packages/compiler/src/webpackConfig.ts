@@ -33,7 +33,7 @@ export default (config:webpack.Configuration, pkg:any, isDev?:boolean):webpack.C
       clean: true,
       libraryTarget: "system",
       crossOriginLoading: "anonymous",
-      publicPath: '',
+      publicPath: `${config.output.publicPath || "/public"}/${pkg.name}@${pkg.version}/`,
       filename: `${pkg.name}.js`,
       chunkFilename:`${pkg.name}.[name].js`
     },
