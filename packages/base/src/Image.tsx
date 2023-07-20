@@ -8,7 +8,7 @@ interface ImageProps extends MojitoComponentProps {
   preview?:boolean
 }
 
-function Image({src, width="100%", height, preview=false, $style}:ImageProps) {
+function Image({src, width="100%", height="100%", preview=false, $style}:ImageProps) {
 	return (
 		<AntdImg
       style={{...$style}}

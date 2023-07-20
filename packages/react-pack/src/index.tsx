@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from 'nanoid'
 
@@ -6,6 +6,8 @@ const ROOT = Symbol();
 const EVENTER = Symbol();
 const PROPS = Symbol();
 const ID = Symbol();
+const COMPONENT = Symbol();
+const INFO = Symbol();
 const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 
 export interface MojitoComponentProps {
@@ -38,64 +40,76 @@ export type ComponentInfo = {
 export interface MojitoComponent<T> {
   [ROOT]:null | ReactDOM.Root,
   [EVENTER]:null | EventTarget,
-	[PROPS]?:any,
+	[PROPS]?:Record<string, any>,
 	[ID]:string
 	framework?:{
-		name:"react"|"vue",
+		name:string,
 		version:string
 	}
-  component:T,
-  componentInfo:ComponentInfo,
+  [COMPONENT]:T,
+  [INFO]:ComponentInfo,
   mount(container: Element | DocumentFragment, props?: any):void,
   unmount():void
   setProps(newProps:any):void
-	getProps():Record<string, any>
+	getProps():Record<string, any> | undefined
 	getDefaultProps():Record<string, any> | undefined
 	getComponentId():string
 	setEvent(eventName:string, callback:(...args:any[])=>any):any
 }
 
-export function CreatePack<T extends object>(component:T,componentInfo:ComponentInfo): MojitoComponent<T> {
-	return {
-		component,
-		componentInfo,
-		framework:{
+export function CreatePack<T extends object>(component:T,componentInfo:ComponentInfo) {
+	const componentId = nanoid();
+	return class MojitoPack implements MojitoComponent<T> {
+		[COMPONENT]:T = component;
+		[INFO] = componentInfo
+		framework = {
 			name:"react",
 			version:React.version
-		},
-		[ROOT]: null,
-		[EVENTER]: null,
-		[ID]:nanoid(),
-		mount(container: Element | DocumentFragment, props?: any) {
+		};
+		[ROOT]:null | ReactDOM.Root = null;
+		[EVENTER]:null | EventTarget = null;
+		[PROPS]?:Record<string, any> = undefined;
+		[ID] = componentId;
+
+		get component(){
+			return this[COMPONENT]
+		}
+
+		get componentInfo(){
+			return this[INFO]
+		}
+
+		mount(container: Element | DocumentFragment, props?: Record<string, any>, onMount?:(props?:Record<string, any>)=>void) {
       const eventer = new EventTarget();
 			const client = ReactDOM.createRoot(container);
 			this[ROOT]= client;
       this[EVENTER] = eventer;
 			this[PROPS] = {...this.getDefaultProps(), ...props};
 			client.render(
-				<App component={this.component} props={this[PROPS]} evener={this[EVENTER]} />
+				<App component={this.component} props={this[PROPS]} evener={this[EVENTER]} onMount={onMount} />
 			);
-		},
+		}
 		unmount() {
       if(this[ROOT]){
         this[ROOT].unmount();
 				this[ROOT] = null;
         this[EVENTER] = null;
       }
-		},
+		}
 		setProps(newProps: any) {
       if(this[EVENTER]){
 				const oldProps = this[PROPS];
 				this[PROPS] = {...oldProps, ...newProps};
 			  this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, this[PROPS]));
       }
-		},
+		}
 		setEvent(eventName:string, callback:(...args:any[])=>any, thisArg?:any){
 			this.setProps({[eventName]:callback.bind(thisArg)});
-		},
+		}
+
 		getProps(){
 			return this[PROPS];
-		},
+		}
 		getDefaultProps(){
 			let defaultProps:any;
 			if(this.componentInfo.props){
@@ -109,7 +123,7 @@ export function CreatePack<T extends object>(component:T,componentInfo:Component
 				}
 			}
 			return defaultProps
-		},
+		}
 		getComponentId(){
 			return this[ID]
 		}
@@ -124,12 +138,18 @@ class AppEvent extends Event {
 	}
 }
 
-const App: React.FC<{ component: any; props?: any; evener: EventTarget }> = ({
+const App: React.FC<{ component: any; props?: any; evener: EventTarget, onMount?:(props?:Record<string, any>)=>void }> = ({
 	component: Comp,
 	props,
 	evener,
+	onMount,
 }) => {
 	const [currProps, setCurrProps] = useState(props);
+	useEffect(()=>{
+		if(onMount){
+			onMount(props)
+		}
+	}, [])
 	useEffect(() => {
 		const callback = ({ data }: AppEvent) => {
 			setCurrProps(data);

@@ -210,13 +210,19 @@ function parseEntry(entry) {
     const parseCreatePack = (callExpression) => {
         // 获取返回类型
         const returnType = callExpression.getReturnType();
-        const returnPropertys = returnType
-            .getProperties()
-            .map((property) => property.getName());
-        if (returnPropertys.includes("componentInfo") &&
+        // const returnPropertys = returnType
+        // 	.getProperties()
+        // 	.map((property) => property.getName());
+        const returnPropertys = returnType.getText();
+        if (returnPropertys.includes("[INFO]") &&
+            returnPropertys.includes("[EVENTER]") &&
+            returnPropertys.includes("[ROOT]") &&
+            returnPropertys.includes("[PROPS]") &&
+            returnPropertys.includes("[COMPONENT]") &&
+            returnPropertys.includes("component") &&
+            returnPropertys.includes("componentInfo") &&
             returnPropertys.includes("mount") &&
             returnPropertys.includes("unmount") &&
-            returnPropertys.includes("component") &&
             returnPropertys.includes("setProps") &&
             returnPropertys.includes("getProps")) {
             // 确定是createPack调用， 获取createPack的两个参数
