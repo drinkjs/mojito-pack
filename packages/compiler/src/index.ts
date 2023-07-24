@@ -110,17 +110,16 @@ function parseEntry(entry: string | string[]) {
 		// 	.getProperties()
 		// 	.map((property) => property.getName());
 		const returnPropertys = returnType.getText();
-		if (returnPropertys.includes("[INFO]") &&
-			returnPropertys.includes("[EVENTER]") &&
-			returnPropertys.includes("[ROOT]") &&
-			returnPropertys.includes("[PROPS]") &&
-			returnPropertys.includes("[COMPONENT]") &&
-			returnPropertys.includes("component") &&
-			returnPropertys.includes("componentInfo") &&
-			returnPropertys.includes("mount") &&
-			returnPropertys.includes("unmount") &&
-			returnPropertys.includes("setProps") &&
-			returnPropertys.includes("getProps")
+		if (returnPropertys.includes("__root") &&
+		returnPropertys.includes("__eventer") &&
+		returnPropertys.includes("__root") &&
+		returnPropertys.includes("__props") &&
+		returnPropertys.includes("component") &&
+		returnPropertys.includes("componentInfo") &&
+		returnPropertys.includes("mount") &&
+		returnPropertys.includes("unmount") &&
+		returnPropertys.includes("setProps") &&
+		returnPropertys.includes("getProps")
 		) {
 			// 确定是createPack调用， 获取createPack的两个参数
 			const [arg1, arg2] = callExpression.getArguments();

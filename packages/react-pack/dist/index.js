@@ -1,89 +1,75 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { nanoid } from 'nanoid';
-const ROOT = Symbol();
-const EVENTER = Symbol();
-const PROPS = Symbol();
-const ID = Symbol();
-const COMPONENT = Symbol();
-const INFO = Symbol();
+import { nanoid } from "nanoid";
 const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 export function CreatePack(component, componentInfo) {
-    var _a, _b, _c, _d, _e, _f, _g;
     const componentId = nanoid();
-    return _g = class MojitoPack {
-            constructor() {
-                this[_a] = component;
-                this[_b] = componentInfo;
-                this.framework = {
-                    name: "react",
-                    version: React.version
-                };
-                this[_c] = null;
-                this[_d] = null;
-                this[_e] = undefined;
-                this[_f] = componentId;
+    return class MojitoPack {
+        constructor() {
+            this.__component = component;
+            this.__info = componentInfo;
+            this.__root = null;
+            this.__eventer = null;
+            this.__props = undefined;
+            this.__id = componentId;
+            this.framework = {
+                name: "react",
+                version: React.version,
+            };
+        }
+        get component() {
+            return this.__component;
+        }
+        get componentInfo() {
+            return this.__info;
+        }
+        get componentId() {
+            return this.__id;
+        }
+        mount(container, props, onMount) {
+            const eventer = new EventTarget();
+            const client = ReactDOM.createRoot(container);
+            this.__root = client;
+            this.__eventer = eventer;
+            this.__props = Object.assign(Object.assign({}, this.getDefaultProps()), props);
+            client.render(_jsx(App, { component: this.component, props: this.__props, evener: this.__eventer, onMount: onMount }));
+        }
+        unmount() {
+            if (this.__root) {
+                this.__root.unmount();
+                this.__root = null;
+                this.__eventer = null;
             }
-            get component() {
-                return this[COMPONENT];
+        }
+        setProps(newProps) {
+            if (this.__eventer) {
+                const oldProps = this.__props;
+                this.__props = Object.assign(Object.assign({}, oldProps), newProps);
+                this.__eventer.dispatchEvent(new AppEvent(UPDATE_PROPS, this.__props));
             }
-            get componentInfo() {
-                return this[INFO];
-            }
-            mount(container, props, onMount) {
-                const eventer = new EventTarget();
-                const client = ReactDOM.createRoot(container);
-                this[ROOT] = client;
-                this[EVENTER] = eventer;
-                this[PROPS] = Object.assign(Object.assign({}, this.getDefaultProps()), props);
-                client.render(_jsx(App, { component: this.component, props: this[PROPS], evener: this[EVENTER], onMount: onMount }));
-            }
-            unmount() {
-                if (this[ROOT]) {
-                    this[ROOT].unmount();
-                    this[ROOT] = null;
-                    this[EVENTER] = null;
-                }
-            }
-            setProps(newProps) {
-                if (this[EVENTER]) {
-                    const oldProps = this[PROPS];
-                    this[PROPS] = Object.assign(Object.assign({}, oldProps), newProps);
-                    this[EVENTER].dispatchEvent(new AppEvent(UPDATE_PROPS, this[PROPS]));
-                }
-            }
-            setEvent(eventName, callback, thisArg) {
-                this.setProps({ [eventName]: callback.bind(thisArg) });
-            }
-            getProps() {
-                return this[PROPS];
-            }
-            getDefaultProps() {
-                let defaultProps;
-                if (this.componentInfo.props) {
-                    for (const key in this.componentInfo.props) {
-                        if (this.componentInfo.props[key].default) {
-                            if (!defaultProps) {
-                                defaultProps = {};
-                            }
-                            defaultProps[key] = this.componentInfo.props[key].default;
+        }
+        setEvent(eventName, callback, thisArg) {
+            this.setProps({ [eventName]: callback.bind(thisArg) });
+        }
+        getProps() {
+            return this.__props;
+        }
+        getDefaultProps() {
+            let defaultProps;
+            if (this.componentInfo.props) {
+                for (const key in this.componentInfo.props) {
+                    if (this.componentInfo.props[key].default) {
+                        if (!defaultProps) {
+                            defaultProps = {};
                         }
+                        defaultProps[key] = this.componentInfo.props[key].default;
                     }
                 }
-                return defaultProps;
             }
-            getComponentId() {
-                return this[ID];
-            }
-        },
-        _a = COMPONENT,
-        _b = INFO,
-        _c = ROOT,
-        _d = EVENTER,
-        _e = PROPS,
-        _f = ID,
-        _g;
+            return defaultProps;
+        }
+    };
 }
 class AppEvent extends Event {
     constructor(type, data) {
@@ -91,7 +77,7 @@ class AppEvent extends Event {
         this.data = data;
     }
 }
-const App = ({ component: Comp, props, evener, onMount, }) => {
+const App = ({ component: Comp, props, evener, onMount }) => {
     const [currProps, setCurrProps] = useState(props);
     useEffect(() => {
         if (onMount) {
@@ -105,5 +91,5 @@ const App = ({ component: Comp, props, evener, onMount, }) => {
         evener.addEventListener(UPDATE_PROPS, callback);
         return () => evener.removeEventListener(UPDATE_PROPS, callback);
     }, [evener]);
-    return (_jsx(Comp, Object.assign({}, currProps)));
+    return _jsx(Comp, Object.assign({}, currProps));
 };

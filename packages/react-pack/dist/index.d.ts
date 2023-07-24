@@ -1,11 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-declare const ROOT: unique symbol;
-declare const EVENTER: unique symbol;
-declare const PROPS: unique symbol;
-declare const ID: unique symbol;
-declare const COMPONENT: unique symbol;
-declare const INFO: unique symbol;
 export interface MojitoComponentProps {
     $syncData?: Record<string, any>;
     $display: "editor" | "viewer";
@@ -31,45 +25,40 @@ export type ComponentInfo = {
     deps?: Record<string, string>;
 };
 export interface MojitoComponent<T> {
-    [ROOT]: null | ReactDOM.Root;
-    [EVENTER]: null | EventTarget;
-    [PROPS]?: Record<string, any>;
-    [ID]: string;
     framework?: {
         name: string;
         version: string;
     };
-    [COMPONENT]: T;
-    [INFO]: ComponentInfo;
     mount(container: Element | DocumentFragment, props?: any): void;
     unmount(): void;
     setProps(newProps: any): void;
     getProps(): Record<string, any> | undefined;
     getDefaultProps(): Record<string, any> | undefined;
-    getComponentId(): string;
     setEvent(eventName: string, callback: (...args: any[]) => any): any;
+    readonly component: T;
+    readonly componentInfo: ComponentInfo;
+    readonly componentId: string;
 }
 export declare function CreatePack<T extends object>(component: T, componentInfo: ComponentInfo): {
     new (): {
+        __component: T;
+        __info: ComponentInfo;
+        __root: null | ReactDOM.Root;
+        __eventer: null | EventTarget;
+        __props?: Record<string, any> | undefined;
+        __id: string;
         framework: {
             name: string;
             version: string;
         };
         readonly component: T;
         readonly componentInfo: ComponentInfo;
+        readonly componentId: string;
         mount(container: Element | DocumentFragment, props?: Record<string, any>, onMount?: ((props?: Record<string, any>) => void) | undefined): void;
         unmount(): void;
         setProps(newProps: any): void;
         setEvent(eventName: string, callback: (...args: any[]) => any, thisArg?: any): void;
         getProps(): Record<string, any> | undefined;
         getDefaultProps(): any;
-        getComponentId(): string;
-        [COMPONENT]: T;
-        [INFO]: ComponentInfo;
-        [ROOT]: null | ReactDOM.Root;
-        [EVENTER]: null | EventTarget;
-        [PROPS]?: Record<string, any> | undefined;
-        [ID]: string;
     };
 };
-export {};
