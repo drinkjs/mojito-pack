@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
 
-const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
+// const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 
 export interface MojitoComponentProps {
-	$syncData?: Record<string, any>;
+	$syncData?: Record<string, {args:any[], retruns?:any}>;
 	$display: "editor" | "viewer";
 	$style?: React.CSSProperties;
 	$setProps: (props: Record<string, any>) => void;
@@ -34,6 +34,8 @@ export type ComponentInfo = {
 	deps?: Record<string, string>;
 };
 
+type AppActionRef =  React.MutableRefObject<{updateProps: (props: Record<string, any>) => void} | undefined>
+
 export interface MojitoComponent<T> {
 	framework?: {
 		name: string;
@@ -59,9 +61,10 @@ export function CreatePack<T extends object>(
 		__component: T = component;
 		__info = componentInfo;
 		__root: null | ReactDOM.Root = null;
-		__eventer: null | EventTarget = null;
+		// __eventer: null | EventTarget = null;
 		__props?: Record<string, any> = undefined;
 		__id = componentId;
+		__ref: AppActionRef = {current:undefined}
 		framework = {
 			name: "react",
 			version: React.version,
@@ -84,17 +87,15 @@ export function CreatePack<T extends object>(
 			props?: Record<string, any>,
 			onMount?: (props?: Record<string, any>) => void
 		) {
-			const eventer = new EventTarget();
 			const client = ReactDOM.createRoot(container);
 			this.__root = client;
-			this.__eventer = eventer;
 			this.__props = { ...this.getDefaultProps(), ...props };
 			client.render(
 				<App
-					component={this.component}
+					component={this.__component}
 					props={this.__props}
-					evener={this.__eventer}
 					onMount={onMount}
+					appRef={this.__ref}
 				/>
 			);
 		}
@@ -102,14 +103,13 @@ export function CreatePack<T extends object>(
 			if (this.__root) {
 				this.__root.unmount();
 				this.__root = null;
-				this.__eventer = null;
 			}
 		}
 		setProps(newProps: any) {
-			if (this.__eventer) {
+			if (this.__ref.current) {
 				const oldProps = this.__props;
 				this.__props = { ...oldProps, ...newProps };
-				this.__eventer.dispatchEvent(new AppEvent(UPDATE_PROPS, this.__props));
+				this.__ref.current.updateProps(this.__props!)
 			}
 		}
 		setEvent(
@@ -140,32 +140,37 @@ export function CreatePack<T extends object>(
 	};
 }
 
-class AppEvent extends Event {
-	data?: any;
-	constructor(type: string, data?: any) {
-		super(type);
-		this.data = data;
-	}
-}
+// class AppEvent extends Event {
+// 	data?: any;
+// 	constructor(type: string, data?: any) {
+// 		super(type);
+// 		this.data = data;
+// 	}
+// }
 
 const App: React.FC<{
 	component: any;
 	props?: any;
-	evener: EventTarget;
 	onMount?: (props?: Record<string, any>) => void;
-}> = ({ component: Comp, props, evener, onMount }) => {
+	appRef?: AppActionRef;
+}> = ({ component: Comp, props, appRef, onMount }) => {
 	const [currProps, setCurrProps] = useState(props);
+
+	useImperativeHandle(
+		appRef,
+		() => ({
+			updateProps:(props:Record<string, any>)=>{
+				setCurrProps(props)
+			}
+		}),
+		[]
+	);
+
 	useEffect(() => {
 		if (onMount) {
 			onMount(props);
 		}
 	}, []);
-	useEffect(() => {
-		const callback = ({ data }: AppEvent) => {
-			setCurrProps(data);
-		};
-		evener.addEventListener(UPDATE_PROPS, callback);
-		return () => evener.removeEventListener(UPDATE_PROPS, callback);
-	}, [evener]);
+
 	return <Comp {...currProps} />;
 };

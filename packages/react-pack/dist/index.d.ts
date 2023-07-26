@@ -1,7 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 export interface MojitoComponentProps {
-    $syncData?: Record<string, any>;
+    $syncData?: Record<string, {
+        args: any[];
+        retruns?: any;
+    }>;
     $display: "editor" | "viewer";
     $style?: React.CSSProperties;
     $setProps: (props: Record<string, any>) => void;
@@ -24,6 +27,9 @@ export type ComponentInfo = {
     }>;
     deps?: Record<string, string>;
 };
+type AppActionRef = React.MutableRefObject<{
+    updateProps: (props: Record<string, any>) => void;
+} | undefined>;
 export interface MojitoComponent<T> {
     framework?: {
         name: string;
@@ -44,9 +50,9 @@ export declare function CreatePack<T extends object>(component: T, componentInfo
         __component: T;
         __info: ComponentInfo;
         __root: null | ReactDOM.Root;
-        __eventer: null | EventTarget;
         __props?: Record<string, any> | undefined;
         __id: string;
+        __ref: AppActionRef;
         framework: {
             name: string;
             version: string;
@@ -62,3 +68,4 @@ export declare function CreatePack<T extends object>(component: T, componentInfo
         getDefaultProps(): any;
     };
 };
+export {};

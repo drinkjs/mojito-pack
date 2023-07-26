@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import covid19 from "./data/covid2019.json";
+// import covid19 from "./data/covid2019.json";
 import Global from "./Global";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { throttle } from "./common/util";
+import { technique, throttle } from "./common/util";
 import { MojitoComponentProps } from "@mojito/react-pack";
 
 type XYZ = { x: number; y: number; z: number };
@@ -14,20 +14,22 @@ interface EarthProps extends MojitoComponentProps {
 	onControl?: (params: { cp: XYZ; cr: XYZ; gp: XYZ; gr: XYZ }) => void;
 }
 
-const defaultData = covid19.map(({ coordinates, stats }) => ({
-	lat: coordinates.latitude,
-	lng: coordinates.longitude,
-	value: stats.confirmed,
-}));
+// const defaultData = covid19.map(({ coordinates, stats }) => ({
+// 	lat: coordinates.latitude,
+// 	lng: coordinates.longitude,
+// 	value: stats.confirmed,
+// }));
 
-export default function Earth({ data = defaultData, onControl, $syncData }: EarthProps) {
+let stopTimer:any;
+
+export default function Earth({ data, onControl, $syncData }: EarthProps) {
 	const [isControl, setIsControl] = useState(false);
 	const controlRef = useRef<any>();
 	const groupRef = useRef<THREE.Group | null>(null);
 
 	useEffect(()=>{
-		if($syncData && $syncData.onControl){
-			const {cp, cr, gp, gr} = $syncData.onControl;
+		if($syncData?.onControl){
+			const {cp, cr, gp, gr} = $syncData.onControl.args[0]; // onControl回调的第一个参数
 			if(groupRef.current){
 				groupRef.current.position.set(gp.x, gp.y, gp.z);
 				groupRef.current.rotation.set(gr.x, gr.y, gr.z);
@@ -39,20 +41,25 @@ export default function Earth({ data = defaultData, onControl, $syncData }: Eart
 			}
 
 		}
-	}, [$syncData])
+	}, [$syncData?.onControl])
 
 	const startHandler = useCallback(() => {
+		if(stopTimer){
+			clearTimeout(stopTimer);
+		}
 		setIsControl(true);
 	}, []);
 
-	const endHandler = useCallback(() => {
-		setIsControl(false);
-		changeHandler();
-	}, []);
+	const endHandler = useCallback(()=>{
+		if(stopTimer){
+			clearTimeout(stopTimer);
+		}
+		stopTimer = setTimeout(setIsControl, 2000, false)
+	}, [onControl]);
 
 	const changeHandler = useCallback(
 		throttle(() => {
-			if (controlRef.current && groupRef.current && onControl) {
+			if (isControl && controlRef.current && groupRef.current && onControl) {
 				const { position, rotation } = controlRef.current.object;
 				const { position: gpos, rotation: grot } = groupRef.current;
 				onControl({
@@ -62,8 +69,8 @@ export default function Earth({ data = defaultData, onControl, $syncData }: Eart
 					gr: { x: grot.x, y: grot.y, z: grot.z },
 				});
 			}
-		}, 100),
-		[]
+		}, 50),
+		[isControl, onControl]
 	);
 
 	return (
@@ -75,7 +82,7 @@ export default function Earth({ data = defaultData, onControl, $syncData }: Eart
 					onChange={changeHandler}
 					ref={controlRef}
 				/>
-				<Global data={defaultData} isPause={isControl} gref={groupRef} />
+				<Global data={data} isPause={isControl} gref={groupRef} />
 			</Canvas>
 		</div>
 	);

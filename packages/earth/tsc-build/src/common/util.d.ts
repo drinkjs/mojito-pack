@@ -17,3 +17,4 @@ export declare function convertFlatCoordsToSphereCoords({ x, y, width, height, r
     z: number;
 };
 export declare function throttle(callback: (...args: any[]) => void, delay: number): (...args: any[]) => void;
+export declare function technique(callback: (...args: any[]) => void, delay: number): (...args: any[]) => void;

@@ -1,6 +1,6 @@
 import { CreatePack } from "@mojito/react-pack";
 import Earth from "./index";
-import covid19 from "./data/covid2019.json";
+import defaultData from "./data/defaultData.json";
 
 export default CreatePack(Earth, {
 	name: "点阵地球",
@@ -9,7 +9,7 @@ export default CreatePack(Earth, {
 			name: "数据",
 			type: "array",
 			description: "{ lat: string, lng: string, value: number }[]",
-			default: covid19,
+			default: defaultData,
 		},
 	},
 	events: {

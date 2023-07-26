@@ -24,7 +24,8 @@ sys.import("./IMPORT_FILE").then((data)=>{
     console.log(key)
     const compPromise = data[key];
     if(typeof compPromise === "function"){
-      compPromise().then((comp)=>{
+      compPromise().then((Component)=>{
+        const comp = new Component()
         console.log(comp)
         if(comp.mount && comp.component){
         let props = {}

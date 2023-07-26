@@ -111,9 +111,10 @@ function parseEntry(entry: string | string[]) {
 		// 	.map((property) => property.getName());
 		const returnPropertys = returnType.getText();
 		if (returnPropertys.includes("__root") &&
-		returnPropertys.includes("__eventer") &&
-		returnPropertys.includes("__root") &&
+		returnPropertys.includes("__ref") &&
 		returnPropertys.includes("__props") &&
+		returnPropertys.includes("__component") &&
+		returnPropertys.includes("__info") &&
 		returnPropertys.includes("component") &&
 		returnPropertys.includes("componentInfo") &&
 		returnPropertys.includes("mount") &&

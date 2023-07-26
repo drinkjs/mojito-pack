@@ -1,8 +1,7 @@
 import { jsx as _jsx } from "react/jsx-runtime";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useImperativeHandle, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
-const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 export function CreatePack(component, componentInfo) {
     const componentId = nanoid();
     return class MojitoPack {
@@ -10,9 +9,10 @@ export function CreatePack(component, componentInfo) {
             this.__component = component;
             this.__info = componentInfo;
             this.__root = null;
-            this.__eventer = null;
+            // __eventer: null | EventTarget = null;
             this.__props = undefined;
             this.__id = componentId;
+            this.__ref = { current: undefined };
             this.framework = {
                 name: "react",
                 version: React.version,
@@ -28,25 +28,22 @@ export function CreatePack(component, componentInfo) {
             return this.__id;
         }
         mount(container, props, onMount) {
-            const eventer = new EventTarget();
             const client = ReactDOM.createRoot(container);
             this.__root = client;
-            this.__eventer = eventer;
             this.__props = Object.assign(Object.assign({}, this.getDefaultProps()), props);
-            client.render(_jsx(App, { component: this.component, props: this.__props, evener: this.__eventer, onMount: onMount }));
+            client.render(_jsx(App, { component: this.__component, props: this.__props, onMount: onMount, appRef: this.__ref }));
         }
         unmount() {
             if (this.__root) {
                 this.__root.unmount();
                 this.__root = null;
-                this.__eventer = null;
             }
         }
         setProps(newProps) {
-            if (this.__eventer) {
+            if (this.__ref.current) {
                 const oldProps = this.__props;
                 this.__props = Object.assign(Object.assign({}, oldProps), newProps);
-                this.__eventer.dispatchEvent(new AppEvent(UPDATE_PROPS, this.__props));
+                this.__ref.current.updateProps(this.__props);
             }
         }
         setEvent(eventName, callback, thisArg) {
@@ -71,25 +68,24 @@ export function CreatePack(component, componentInfo) {
         }
     };
 }
-class AppEvent extends Event {
-    constructor(type, data) {
-        super(type);
-        this.data = data;
-    }
-}
-const App = ({ component: Comp, props, evener, onMount }) => {
+// class AppEvent extends Event {
+// 	data?: any;
+// 	constructor(type: string, data?: any) {
+// 		super(type);
+// 		this.data = data;
+// 	}
+// }
+const App = ({ component: Comp, props, appRef, onMount }) => {
     const [currProps, setCurrProps] = useState(props);
+    useImperativeHandle(appRef, () => ({
+        updateProps: (props) => {
+            setCurrProps(props);
+        }
+    }), []);
     useEffect(() => {
         if (onMount) {
             onMount(props);
         }
     }, []);
-    useEffect(() => {
-        const callback = ({ data }) => {
-            setCurrProps(data);
-        };
-        evener.addEventListener(UPDATE_PROPS, callback);
-        return () => evener.removeEventListener(UPDATE_PROPS, callback);
-    }, [evener]);
     return _jsx(Comp, Object.assign({}, currProps));
 };

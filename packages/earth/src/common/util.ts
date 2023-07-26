@@ -47,3 +47,14 @@ import * as THREE from "three";
       }
     }
   }
+
+  export function technique(callback: (...args:any[])=>void, delay:number){
+    let timer:any;
+    return (...args:any[])=>{
+      if(timer){
+        clearTimeout(timer);
+        timer = undefined;
+      }
+      timer = setTimeout(callback, delay, ...args);
+    } 
+  }
