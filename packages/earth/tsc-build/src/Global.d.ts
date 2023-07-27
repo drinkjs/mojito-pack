@@ -9,5 +9,6 @@ interface EarthProps {
     isPause?: boolean;
     gref?: React.MutableRefObject<THREE.Group | null>;
 }
-export default function Global({ data, isPause, gref }: EarthProps): import("react/jsx-runtime").JSX.Element;
-export {};
+declare function Global({ data, isPause, gref }: EarthProps): import("react/jsx-runtime").JSX.Element;
+declare const _default: import("react").MemoExoticComponent<typeof Global>;
+export default _default;

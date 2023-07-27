@@ -5,11 +5,8 @@ import { nanoid } from "nanoid";
 // const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
 
 export interface MojitoComponentProps {
-	$syncData?: Record<string, {args:any[], retruns?:any}>;
 	$display: "editor" | "viewer";
 	$style?: React.CSSProperties;
-	$setProps: (props: Record<string, any>) => void;
-	$setStyle: (style: React.CSSProperties) => void;
 }
 
 export type ComponentProps = {
@@ -46,7 +43,6 @@ export interface MojitoComponent<T> {
 	setProps(newProps: any): void;
 	getProps(): Record<string, any> | undefined;
 	getDefaultProps(): Record<string, any> | undefined;
-	setEvent(eventName: string, callback: (...args: any[]) => any): any;
 	readonly component: T;
 	readonly componentInfo: ComponentInfo;
 	readonly componentId: string;
@@ -99,12 +95,14 @@ export function CreatePack<T extends object>(
 				/>
 			);
 		}
+
 		unmount() {
 			if (this.__root) {
 				this.__root.unmount();
 				this.__root = null;
 			}
 		}
+
 		setProps(newProps: any) {
 			if (this.__ref.current) {
 				const oldProps = this.__props;
@@ -112,17 +110,11 @@ export function CreatePack<T extends object>(
 				this.__ref.current.updateProps(this.__props!)
 			}
 		}
-		setEvent(
-			eventName: string,
-			callback: (...args: any[]) => any,
-			thisArg?: any
-		) {
-			this.setProps({ [eventName]: callback.bind(thisArg) });
-		}
 
 		getProps() {
 			return this.__props;
 		}
+
 		getDefaultProps() {
 			let defaultProps: any;
 			if (this.componentInfo.props) {
@@ -163,7 +155,7 @@ const App: React.FC<{
 				setCurrProps(props)
 			}
 		}),
-		[]
+		[currProps]
 	);
 
 	useEffect(() => {

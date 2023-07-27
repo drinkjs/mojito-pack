@@ -19,7 +19,6 @@ declare const _default: new () => {
     mount(container: Element | DocumentFragment, props?: Record<string, any> | undefined, onMount?: ((props?: Record<string, any> | undefined) => void) | undefined): void;
     unmount(): void;
     setProps(newProps: any): void;
-    setEvent(eventName: string, callback: (...args: any[]) => any, thisArg?: any): void;
     getProps(): Record<string, any> | undefined;
     getDefaultProps(): any;
 };

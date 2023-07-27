@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { useRef, useEffect, useState, useMemo, useImperativeHandle } from "react";
+import { useRef, useEffect, useState, useMemo, useImperativeHandle, memo } from "react";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
 import * as d3Scale from "d3-scale";
 import { useFrame } from "@react-three/fiber";
@@ -8,6 +8,7 @@ import {
 	convertLatLngToSphereCoords,
 } from "./common/util";
 import mapPoints from "./data/mapPoints.json";
+import { Group } from "three";
 
 const GlobeRadius = 100;
 const GlobeSegments = 64;
@@ -48,8 +49,7 @@ interface EarthProps {
   gref?:React.MutableRefObject<THREE.Group | null>
 }
 
-export default function Global({data, isPause, gref}: EarthProps){
-
+function Global({data, isPause, gref}: EarthProps){
   const groupRef = useRef<THREE.Group | null>(null);
   const [earthMesh, setEarthMesh] = useState<THREE.Mesh | null>(null);
   useFrame((state, delta) => {
@@ -125,3 +125,10 @@ export default function Global({data, isPause, gref}: EarthProps){
   </group>
   )
 }
+
+export default memo(Global, (prev, next) => {
+  if((prev.isPause === next.isPause) && prev.isPause){
+    return false;
+  }
+  return prev.data !== next.data || prev.isPause !== next.isPause;
+})

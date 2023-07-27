@@ -10,6 +10,12 @@ interface EarthProps extends MojitoComponentProps {
         lng: string;
         value: number;
     }[];
+    positions?: {
+        cp: XYZ;
+        cr: XYZ;
+        gp: XYZ;
+        gr: XYZ;
+    };
     onControl?: (params: {
         cp: XYZ;
         cr: XYZ;
@@ -17,5 +23,5 @@ interface EarthProps extends MojitoComponentProps {
         gr: XYZ;
     }) => void;
 }
-export default function Earth({ data, onControl, $syncData }: EarthProps): import("react/jsx-runtime").JSX.Element;
+export default function Earth({ data, onControl, positions }: EarthProps): import("react/jsx-runtime").JSX.Element;
 export {};

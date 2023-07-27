@@ -1,14 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 export interface MojitoComponentProps {
-    $syncData?: Record<string, {
-        args: any[];
-        retruns?: any;
-    }>;
     $display: "editor" | "viewer";
     $style?: React.CSSProperties;
-    $setProps: (props: Record<string, any>) => void;
-    $setStyle: (style: React.CSSProperties) => void;
 }
 export type ComponentProps = {
     name: string;
@@ -40,7 +34,6 @@ export interface MojitoComponent<T> {
     setProps(newProps: any): void;
     getProps(): Record<string, any> | undefined;
     getDefaultProps(): Record<string, any> | undefined;
-    setEvent(eventName: string, callback: (...args: any[]) => any): any;
     readonly component: T;
     readonly componentInfo: ComponentInfo;
     readonly componentId: string;
@@ -63,7 +56,6 @@ export declare function CreatePack<T extends object>(component: T, componentInfo
         mount(container: Element | DocumentFragment, props?: Record<string, any>, onMount?: ((props?: Record<string, any>) => void) | undefined): void;
         unmount(): void;
         setProps(newProps: any): void;
-        setEvent(eventName: string, callback: (...args: any[]) => any, thisArg?: any): void;
         getProps(): Record<string, any> | undefined;
         getDefaultProps(): any;
     };

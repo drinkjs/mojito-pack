@@ -10,8 +10,9 @@ import { MojitoComponentProps } from "@mojito/react-pack";
 type XYZ = { x: number; y: number; z: number };
 
 interface EarthProps extends MojitoComponentProps {
-	data: { lat: string; lng: string; value: number }[];
-	onControl?: (params: { cp: XYZ; cr: XYZ; gp: XYZ; gr: XYZ }) => void;
+	data: { lat: string; lng: string; value: number }[],
+	positions?: { cp: XYZ; cr: XYZ; gp: XYZ; gr: XYZ },
+	onControl?: (params: { cp: XYZ; cr: XYZ; gp: XYZ; gr: XYZ }) => void
 }
 
 // const defaultData = covid19.map(({ coordinates, stats }) => ({
@@ -22,14 +23,23 @@ interface EarthProps extends MojitoComponentProps {
 
 let stopTimer:any;
 
-export default function Earth({ data, onControl, $syncData }: EarthProps) {
+export default function Earth({ data, onControl, positions}: EarthProps) {
 	const [isControl, setIsControl] = useState(false);
 	const controlRef = useRef<any>();
 	const groupRef = useRef<THREE.Group | null>(null);
+	const [pos, setPos] = useState<typeof positions | undefined>();
 
 	useEffect(()=>{
-		if($syncData?.onControl){
-			const {cp, cr, gp, gr} = $syncData.onControl.args[0]; // onControl回调的第一个参数
+		if(isControl){
+			setPos(undefined);
+		}else{
+			setPos(positions);
+		}
+	}, [positions, isControl])
+
+	useEffect(()=>{
+		if(pos){
+			const {cp, cr, gp, gr} = pos;
 			if(groupRef.current){
 				groupRef.current.position.set(gp.x, gp.y, gp.z);
 				groupRef.current.rotation.set(gr.x, gr.y, gr.z);
@@ -39,9 +49,8 @@ export default function Earth({ data, onControl, $syncData }: EarthProps) {
 				controlRef.current.object.position.set(cp.x, cp.y, cp.z);
 				controlRef.current.object.rotation.set(cr.x, cr.y, cr.z);
 			}
-
 		}
-	}, [$syncData?.onControl])
+	}, [pos, isControl])
 
 	const startHandler = useCallback(() => {
 		if(stopTimer){
@@ -54,7 +63,9 @@ export default function Earth({ data, onControl, $syncData }: EarthProps) {
 		if(stopTimer){
 			clearTimeout(stopTimer);
 		}
-		stopTimer = setTimeout(setIsControl, 2000, false)
+		stopTimer = setTimeout(()=>{
+			setIsControl(false);
+		}, 2000)
 	}, [onControl]);
 
 	const changeHandler = useCallback(
@@ -69,7 +80,7 @@ export default function Earth({ data, onControl, $syncData }: EarthProps) {
 					gr: { x: grot.x, y: grot.y, z: grot.z },
 				});
 			}
-		}, 50),
+		}, 100),
 		[isControl, onControl]
 	);
 

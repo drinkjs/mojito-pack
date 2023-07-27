@@ -46,9 +46,6 @@ export function CreatePack(component, componentInfo) {
                 this.__ref.current.updateProps(this.__props);
             }
         }
-        setEvent(eventName, callback, thisArg) {
-            this.setProps({ [eventName]: callback.bind(thisArg) });
-        }
         getProps() {
             return this.__props;
         }
@@ -81,7 +78,7 @@ const App = ({ component: Comp, props, appRef, onMount }) => {
         updateProps: (props) => {
             setCurrProps(props);
         }
-    }), []);
+    }), [currProps]);
     useEffect(() => {
         if (onMount) {
             onMount(props);
