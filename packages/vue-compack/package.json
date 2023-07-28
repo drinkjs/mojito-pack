@@ -1,0 +1,17 @@
+{
+  "name": "vue-compack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nanoid": "^4.0.2",
+    "vue": "^3.3.4",
+    "vue-tsc": "^1.8.8"
+  }
+}

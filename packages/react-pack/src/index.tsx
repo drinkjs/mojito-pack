@@ -1,9 +1,6 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
-
-// const UPDATE_PROPS = "__MOJITO_UPDATE_PROPS__";
-
 export interface MojitoComponentProps {
 	$display: "editor" | "viewer";
 	$style?: React.CSSProperties;
@@ -100,14 +97,15 @@ export function CreatePack<T extends object>(
 			if (this.__root) {
 				this.__root.unmount();
 				this.__root = null;
+				this.__ref.current = undefined;
 			}
 		}
 
-		setProps(newProps: any) {
+		setProps(newProps: Record<string, any>) {
 			if (this.__ref.current) {
 				const oldProps = this.__props;
 				this.__props = { ...oldProps, ...newProps };
-				this.__ref.current.updateProps(this.__props!)
+				this.__ref.current.updateProps(this.__props)
 			}
 		}
 
@@ -131,14 +129,6 @@ export function CreatePack<T extends object>(
 		}
 	};
 }
-
-// class AppEvent extends Event {
-// 	data?: any;
-// 	constructor(type: string, data?: any) {
-// 		super(type);
-// 		this.data = data;
-// 	}
-// }
 
 const App: React.FC<{
 	component: any;

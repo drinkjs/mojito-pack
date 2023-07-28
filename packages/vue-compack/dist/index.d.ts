@@ -1,8 +1,7 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import Vue from "vue";
 export interface MojitoComponentProps {
     $display: "editor" | "viewer";
-    $style?: React.CSSProperties;
+    $style?: Record<string, any>;
 }
 export type ComponentProps = {
     name: string;
@@ -21,9 +20,6 @@ export type ComponentInfo = {
     }>;
     deps?: Record<string, string>;
 };
-type AppActionRef = React.MutableRefObject<{
-    updateProps: (props: Record<string, any>) => void;
-} | undefined>;
 export interface MojitoComponent<T> {
     framework?: {
         name: string;
@@ -38,14 +34,37 @@ export interface MojitoComponent<T> {
     readonly componentInfo: ComponentInfo;
     readonly componentId: string;
 }
+declare const App: Vue.DefineComponent<{
+    componentProps: {
+        type: ObjectConstructor;
+        default: () => void;
+    };
+    component: {
+        type: Vue.PropType<Vue.Component>;
+    };
+}, () => Vue.VNode<Vue.RendererNode, Vue.RendererElement, {
+    [key: string]: any;
+}>, unknown, {}, {}, Vue.ComponentOptionsMixin, Vue.ComponentOptionsMixin, {}, string, Vue.VNodeProps & Vue.AllowedComponentProps & Vue.ComponentCustomProps, Readonly<Vue.ExtractPropTypes<{
+    componentProps: {
+        type: ObjectConstructor;
+        default: () => void;
+    };
+    component: {
+        type: Vue.PropType<Vue.Component>;
+    };
+}>>, {
+    componentProps: Record<string, any>;
+}, {}>;
 export declare function CreatePack<T extends object>(component: T, componentInfo: ComponentInfo): {
     new (): {
         __component: T;
         __info: ComponentInfo;
-        __root: null | ReactDOM.Root;
+        __root: null | Vue.App<Element>;
         __props?: Record<string, any> | undefined;
         __id: string;
-        __ref: AppActionRef;
+        __ref?: Vue.Ref<{
+            updateProps: (props: Record<string, any>) => void;
+        }> | undefined;
         framework: {
             name: string;
             version: string;
@@ -53,7 +72,7 @@ export declare function CreatePack<T extends object>(component: T, componentInfo
         readonly component: T;
         readonly componentInfo: ComponentInfo;
         readonly componentId: string;
-        mount(container: Element | DocumentFragment, props?: Record<string, any>, onMount?: ((props?: Record<string, any>) => void) | undefined): void;
+        mount(container: HTMLElement, props?: Record<string, any>, onMount?: ((props?: Record<string, any>) => void) | undefined): void;
         unmount(): void;
         setProps(newProps: Record<string, any>): void;
         getProps(): Record<string, any> | undefined;
