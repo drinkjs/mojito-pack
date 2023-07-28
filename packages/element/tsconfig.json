@@ -10,12 +10,12 @@
     "declaration": true,
     "outDir": "dist",
     "noEmit": false,
-    "baseUrl": "./",
+    "baseUrl": "./"
   },
   "vueCompilerOptions": {
     "target": 3.3
   },
   "include": [
-    "src",
+    "src"
   ]
 }

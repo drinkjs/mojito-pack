@@ -42,6 +42,9 @@ sys.import("./IMPORT_FILE").then((data)=>{
         box.style.padding = "16px";
         document.body.appendChild(box);
         comp.mount(box, props)
+        setTimeout(()=>{
+          comp.setProps({text:"4444444444444"})
+        }, 5000)
       }
     })
     }

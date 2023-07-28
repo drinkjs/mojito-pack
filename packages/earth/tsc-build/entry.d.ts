@@ -17,7 +17,7 @@ export declare const PackEarth: () => Promise<new () => {
     readonly componentId: string;
     mount(container: Element | DocumentFragment, props?: Record<string, any> | undefined, onMount?: ((props?: Record<string, any> | undefined) => void) | undefined): void;
     unmount(): void;
-    setProps(newProps: any): void;
+    setProps(newProps: Record<string, any>): void;
     getProps(): Record<string, any> | undefined;
     getDefaultProps(): any;
 }>;

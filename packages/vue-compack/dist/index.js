@@ -1,4 +1,5 @@
-import Vue, { defineComponent, h, ref, onMounted } from "vue";
+import * as Vue from "vue";
+import { defineComponent, h, ref, onMounted } from "vue";
 import { nanoid } from "nanoid";
 const App = defineComponent({
     props: {

@@ -3,6 +3,7 @@ import WebpackDevServer from "webpack-dev-server";
 import webpackConfig from "./webpackConfig";
 import path from "path";
 import fs from "fs";
+import { parse, compileTemplate } from '@vue/compiler-sfc'
 // import { rimrafSync } from "rimraf";
 import {
 	CallExpression,
@@ -155,6 +156,11 @@ function parseEntry(entry: string | string[]) {
 	return rel;
 }
 
+function isVue(vueFile:string | string[]){
+	const file = typeof vueFile === "string" ? vueFile : vueFile[0]
+	return file?.substring(vueFile.length - 3) === "vue"
+}
+
 /**
  * 创建webpack compiler
  * @param config
@@ -172,7 +178,7 @@ function createCompiler(config: webpack.Configuration, isDev?: boolean) {
 	}
 
 	const conf = webpackConfig(config, pkg, isDev);
-	conf.entry = `./entry.ts`;
+	conf.entry =  isVue(config.entry as any) ? `./src/entry.vue` : `./entry.ts`;
 	const exportComponents = createEntry(allComponents, conf.entry, true);
 	const compiler = webpack(conf);
 	// 构建memfs文件系统

@@ -1,4 +1,4 @@
-import Vue from "vue";
+import * as Vue from "vue";
 export interface MojitoComponentProps {
     $display: "editor" | "viewer";
     $style?: Record<string, any>;

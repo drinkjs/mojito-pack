@@ -8,6 +8,7 @@ import WebpackDevServer from 'webpack-dev-server';
 import { merge } from 'webpack-merge';
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { VueLoaderPlugin } from 'vue-loader';
 import fs from 'fs';
 import { Project } from 'ts-morph';
 
@@ -58,7 +59,9 @@ var webpackConfig = (config, pkg, isDev) => {
     if (!config.output) {
         config.output = {};
     }
-    const outPath = config.output.path ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}` : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
+    const outPath = config.output.path
+        ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}`
+        : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
     config.output.path = outPath;
     const baseConfig = {
         entry,
@@ -71,16 +74,24 @@ var webpackConfig = (config, pkg, isDev) => {
             clean: true,
             libraryTarget: "system",
             crossOriginLoading: "anonymous",
-            publicPath: isDev ? '' : `${config.output.publicPath || "/public"}/${pkg.name}@${pkg.version}/`,
+            publicPath: isDev
+                ? ""
+                : `${config.output.publicPath || "/public"}/${pkg.name}@${pkg.version}/`,
             filename: `${pkg.name}.js`,
-            chunkFilename: `${pkg.name}.[name].js`
+            chunkFilename: `${pkg.name}.[name].js`,
         },
         watchOptions: {
             aggregateTimeout: 800,
         },
-        plugins: isDev ? [new HtmlWebpackPlugin({ template: path.resolve(__dirname, "./index.html"), inject: false })] : [
-            progress,
-        ],
+        plugins: isDev
+            ? [
+                new HtmlWebpackPlugin({
+                    template: path.resolve(__dirname, "./index.html"),
+                    inject: false,
+                }),
+                new VueLoaderPlugin(),
+            ]
+            : [progress, new VueLoaderPlugin()],
         // optimization: {
         //   splitChunks: {
         //     cacheGroups: {
@@ -96,8 +107,22 @@ var webpackConfig = (config, pkg, isDev) => {
             rules: [
                 {
                     test: /\.tsx?$/,
-                    use: path.resolve(__dirname, "../node_modules/ts-loader"),
+                    use: [
+                        {
+                            loader: path.resolve(__dirname, "../node_modules/ts-loader"),
+                            options: { appendTsSuffixTo: [/\.vue$/] },
+                        },
+                    ],
                     exclude: /node_modules/,
+                },
+                {
+                    test: /\.vue$/,
+                    use: [
+                        {
+                            loader: path.resolve(__dirname, "../node_modules/vue-loader"),
+                            options: { hotReload: false },
+                        },
+                    ],
                 },
                 {
                     test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
@@ -253,6 +278,10 @@ function parseEntry(entry) {
     const rel = parseAST(entry);
     return rel;
 }
+function isVue(vueFile) {
+    const file = typeof vueFile === "string" ? vueFile : vueFile[0];
+    return (file === null || file === void 0 ? void 0 : file.substring(vueFile.length - 3)) === "vue";
+}
 /**
  * 创建webpack compiler
  * @param config
@@ -268,7 +297,7 @@ function createCompiler(config, isDev) {
         config.externals = externalInfo.externals;
     }
     const conf = webpackConfig(config, pkg, isDev);
-    conf.entry = `./entry.ts`;
+    conf.entry = isVue(config.entry) ? `./src/entry.vue` : `./entry.ts`;
     const exportComponents = createEntry(allComponents, conf.entry, true);
     const compiler = webpack(conf);
     // 构建memfs文件系统

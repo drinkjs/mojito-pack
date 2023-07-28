@@ -1,4 +1,5 @@
-  import Vue, { defineComponent,h, Component, ref, onMounted } from "vue";
+  import  * as Vue from "vue";
+  import  { defineComponent,h, Component, ref, onMounted } from "vue";
   import type { PropType } from 'vue'
   import { nanoid } from "nanoid";
 

@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "moduleResolution":"Node",
     "declaration": true,
-    "outDir": "tsc-build",
+    "outDir": "types",
     "baseUrl": "./",
   },
   "include": [
