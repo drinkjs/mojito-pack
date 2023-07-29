@@ -6,7 +6,7 @@ interface TextProps extends MojitoComponentProps {
 	text?: string;
 }
 
-function Text({ text, $display, $style, $setProps }: TextProps) {
+function Text({ text, $display, $style, $updateProps }: TextProps) {
 	const [isInput, setInput] = useState(false);
   const [inputText, setInputText] = useState(text);
 
@@ -16,7 +16,7 @@ function Text({ text, $display, $style, $setProps }: TextProps) {
 
   const onBlur = useCallback(()=>{
     setInput(false);
-    $setProps && $setProps({text: inputText});
+    $updateProps({text: inputText});
   }, [inputText])
 
 	if ($display === "viewer" || !isInput) {

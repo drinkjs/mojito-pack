@@ -10,6 +10,7 @@ import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
 import fs from 'fs';
+import { parse } from '@vue/compiler-sfc';
 import { Project } from 'ts-morph';
 
 /******************************************************************************
@@ -118,6 +119,10 @@ var webpackConfig = (config, pkg, isDev) => {
                 {
                     test: /\.vue$/,
                     use: [
+                        // {
+                        // 	loader: path.resolve(__dirname, "../router-loader"),
+                        // 	options: { isVue: true },
+                        // },
                         {
                             loader: path.resolve(__dirname, "../node_modules/vue-loader"),
                             options: { hotReload: false },
@@ -149,37 +154,59 @@ var webpackConfig = (config, pkg, isDev) => {
     return mergedConfig;
 };
 
-const pkg = require(`${process.cwd()}/package.json`);
-pkg.name = pkg.name.replace(/[\\\/]/g, "-");
-/**
- * 解释externals参数，获取依赖
- * @param configExternals
- * @returns
- */
-function parseExternals(configExternals) {
-    const externals = {};
-    const cdn = {};
-    const confExternals = configExternals;
-    if (Array.isArray(confExternals)) {
-        throw new Error("请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}");
+const EntryFile = "./mojito_entry.ts";
+
+const TempDir = "node_modules/@mojito/__pack";
+function getPathFiles(entry, extname) {
+    const files = [];
+    const stat = fs.lstatSync(entry);
+    if (stat.isDirectory()) {
+        const paths = fs.readdirSync(entry);
+        paths.forEach((p) => {
+            const rels = getPathFiles(path.resolve(entry, p), extname);
+            files.push(...rels);
+        });
     }
-    else if (typeof confExternals === "object") {
-        for (const key in confExternals) {
-            if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
-                throw new Error("请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}");
-            }
-            externals[key] = confExternals[key][1] || key;
-            cdn[externals[key]] = confExternals[key][0];
+    else {
+        if (!extname || path.extname(entry) === extname) {
+            files.push({
+                filename: entry,
+                extname: path.extname(entry),
+                basename: path.basename(entry),
+                source: fs.readFileSync(entry),
+            });
         }
     }
-    return { externals, cdn };
+    return files;
 }
-/**
- * 解释所有入口文件源码，得到所有CreatePack组件信息
- * @param entry
- * @returns
- */
-function parseEntry(entry) {
+function parseVue(filepath) {
+    const buildpath = path.resolve(process.cwd(), TempDir);
+    const files = getPathFiles(filepath, ".vue");
+    if (fs.existsSync(buildpath)) {
+        fs.rmdirSync(buildpath, { recursive: true });
+    }
+    fs.mkdirSync(buildpath, { recursive: true });
+    files.forEach((v) => {
+        const { descriptor, errors } = parse(v.source.toString(), {
+            filename: v.filename,
+            sourceMap: false,
+        });
+        if (errors && errors.length) {
+            throw errors;
+        }
+        if (descriptor.script) {
+            const relativePath = path.relative(filepath, v.filename);
+            const buildFilename = path.resolve(buildpath, relativePath);
+            const buildPathname = path.dirname(buildFilename);
+            if (!fs.existsSync(buildPathname)) {
+                fs.mkdirSync(buildPathname, { recursive: true });
+            }
+            fs.writeFileSync(`${buildFilename}.ts`, descriptor.script.content);
+        }
+    });
+    return parseTs(`${buildpath}/**/*.ts`);
+}
+function parseTs(tsEntry, enptyPath) {
     const parseAST = (entryFile) => {
         // 解析入口文件AST
         const project = new Project({
@@ -275,69 +302,68 @@ function parseEntry(entry) {
             }
         }
     };
-    const rel = parseAST(entry);
-    return rel;
+    return parseAST(tsEntry);
 }
-function isVue(vueFile) {
-    const file = typeof vueFile === "string" ? vueFile : vueFile[0];
-    return (file === null || file === void 0 ? void 0 : file.substring(vueFile.length - 3)) === "vue";
-}
-/**
- * 创建webpack compiler
- * @param config
- * @param isDev
- * @returns
- */
-function createCompiler(config, isDev) {
-    const allComponents = parseEntry(config.entry);
-    const externalInfo = config.externals
-        ? parseExternals(config.externals)
-        : undefined;
-    if (externalInfo) {
-        config.externals = externalInfo.externals;
+function parseEntry(entry, filepath) {
+    if (entry.includes(".vue")) {
+        return parseVue(filepath);
     }
-    const conf = webpackConfig(config, pkg, isDev);
-    conf.entry = isVue(config.entry) ? `./src/entry.vue` : `./entry.ts`;
-    const exportComponents = createEntry(allComponents, conf.entry, true);
-    const compiler = webpack(conf);
-    // 构建memfs文件系统
-    // const vol = new VolCls();
-    // pathTree(vol, [process.cwd()]);
-    // compiler.inputFileSystem = vol;
-    return { compiler, conf, exportComponents, externalInfo };
+    else if (entry.includes(".ts") || entry.includes(".tsx")) {
+        return parseTs(entry);
+    }
+    else {
+        throw new Error(`Cannot be identified ${entry}`);
+    }
 }
 /**
  * 生成入口文件
  * @param allComponents
+ * @param entryPath 入口文件路径
+ * @param isHot 是否为热更新
  */
-function createEntry(allComponents, entryPath, init) {
+function createEntry(entry, isHot) {
+    const parsePath = entry.substring(0, entry.indexOf("*"));
+    const entpryPath = path.resolve(process.cwd(), parsePath);
+    const allComponents = parseEntry(entry, entpryPath);
     if (!allComponents || allComponents.length === 0)
         return [];
-    const memEntry = !init && fs.existsSync(entryPath) ? fs.readFileSync(entryPath).toString() : "";
-    let exportArr = init ? [] : memEntry.split("\n");
+    let exportArr = [];
     const filterImports = [];
     const exportComponents = [];
     allComponents.forEach((component) => {
-        for (const filePath in component) {
-            let importFile = path.relative(process.cwd(), filePath);
+        for (let filePath in component) {
+            const componentInfo = component[filePath];
+            let importFile = "";
+            if (filePath.includes(TempDir)) {
+                filePath = filePath.substring(filePath.indexOf(TempDir) + TempDir.length);
+                importFile = path.relative(process.cwd(), `${entpryPath}/${filePath}`);
+            }
+            else {
+                importFile = path.relative(process.cwd(), filePath);
+            }
             importFile = importFile
                 .substring(0, importFile.lastIndexOf("."))
                 .replace(/\\/g, "/");
-            const componentInfo = component[filePath];
             for (const exportName in componentInfo) {
                 let variable = "";
                 if (exportName === "default") {
                     // 使用文件名作为导出
-                    const defaultName = importFile.substring(importFile.lastIndexOf("/") + 1);
+                    const sp = importFile.split("/");
+                    const lastName = sp[sp.length - 1];
+                    let defaultName = lastName.includes(".") ? lastName.substring(0, lastName.indexOf(".")) : lastName;
+                    if (defaultName === "index") {
+                        // 使用最后一层目录
+                        defaultName = sp[sp.length - 2] || "Component";
+                    }
                     variable = defaultName;
                 }
                 else {
                     variable = exportName;
                 }
                 exportComponents.push({ export: variable, name: componentInfo[exportName].name });
-                // export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
+                // 生成 export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
                 const exportText = `export const ${variable} = async ()=> (await import("./${importFile}")).${exportName};`;
-                if (init) {
+                if (!isHot) {
                     exportArr.push(exportText);
                 }
                 else {
@@ -351,8 +377,53 @@ function createEntry(allComponents, entryPath, init) {
             }
         }
     });
-    fs.writeFileSync(entryPath, exportArr.join("\n"));
+    fs.writeFileSync(EntryFile, exportArr.join("\n"));
     return exportComponents;
+}
+
+const pkg = require(`${process.cwd()}/package.json`);
+pkg.name = pkg.name.replace(/[\\\/]/g, "-");
+/**
+ * 解释externals参数，获取依赖
+ * @param configExternals
+ * @returns
+ */
+function parseExternals(configExternals) {
+    const externals = {};
+    const cdn = {};
+    const confExternals = configExternals;
+    if (Array.isArray(confExternals)) {
+        throw new Error("请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}");
+    }
+    else if (typeof confExternals === "object") {
+        for (const key in confExternals) {
+            if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
+                throw new Error("请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}");
+            }
+            externals[key] = confExternals[key][1] || key;
+            cdn[externals[key]] = confExternals[key][0];
+        }
+    }
+    return { externals, cdn };
+}
+/**
+ * 创建webpack compiler
+ * @param config
+ * @param isDev
+ * @returns
+ */
+function createCompiler(config, isDev) {
+    const externalInfo = config.externals
+        ? parseExternals(config.externals)
+        : undefined;
+    if (externalInfo) {
+        config.externals = externalInfo.externals;
+    }
+    const exportComponents = createEntry(config.entry);
+    const conf = webpackConfig(config, pkg, isDev);
+    conf.entry = EntryFile;
+    const compiler = webpack(conf);
+    return { compiler, conf, exportComponents, externalInfo };
 }
 /**
  * 把真实文件系统转换到memfs系统
@@ -431,17 +502,14 @@ function devServer(config) {
     }
     template = template.replace("IMPORT_FILE", (_a = conf.output) === null || _a === void 0 ? void 0 : _a.filename);
     fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
-    // compiler.plugin("compilation", compilation => {
-    // 	compilation.contextDependencies.push(path.resolve(__dirname, "path/to/directory"));
-    // })
-    compiler.hooks.watchRun.tap("WatchRun", (comp) => {
-        if (comp.modifiedFiles) {
-            // 监听修改的文件重新编译
-            const changedFiles = Array.from(comp.modifiedFiles, (file) => file);
-            const components = parseEntry(changedFiles);
-            createEntry(components, conf.entry);
-        }
-    });
+    // compiler.hooks.watchRun.tap("WatchRun", (comp) => {
+    // 	if (comp.modifiedFiles) {
+    // 		// 监听修改的文件重新编译
+    // 		const changedFiles = Array.from(comp.modifiedFiles,(file) => file);
+    // 		const components = parseEntry(changedFiles);
+    // 		createEntry(components, conf.entry as string, true)
+    // 	}
+    // });
     const devServerOptions = conf.devServer;
     const server = new WebpackDevServer(devServerOptions, compiler);
     const runServer = () => __awaiter(this, void 0, void 0, function* () {

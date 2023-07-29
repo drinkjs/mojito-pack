@@ -13,9 +13,9 @@ const App = defineComponent({
     },
     setup(props, { expose }) {
         const componentProps = ref(props.componentProps);
-        const updateProps = (props) => componentProps.value = Object.assign(Object.assign({}, componentProps.value), props);
+        const updateProps = (props) => (componentProps.value = Object.assign(Object.assign({}, componentProps.value), props));
         expose({
-            updateProps
+            updateProps,
         });
         return () => h(props.component, Object.assign({}, componentProps.value));
     },
@@ -56,7 +56,11 @@ export function CreatePack(component, componentInfo) {
                             onMount(self.__props);
                         }
                     });
-                    return () => h(App, { componentProps: self.__props, component: self.__component, ref: componentRef });
+                    return () => h(App, {
+                        componentProps: self.__props,
+                        component: self.__component,
+                        ref: componentRef,
+                    });
                 },
             });
             this.__root.mount(container);

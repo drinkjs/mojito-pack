@@ -1,10 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+type AppActionRef = React.MutableRefObject<{
+    updateProps: (props: Record<string, any>) => void;
+} | undefined>;
 export interface MojitoComponentProps {
     $display: "editor" | "viewer";
-    $style?: React.CSSProperties;
+    $style: Record<string, any>;
+    $updateProps: (props: Record<string, any>) => void;
 }
-export type ComponentProps = {
+export type ComponentPropsExplain = {
     name: string;
     type: "string" | "number" | "boolean" | "object" | "array";
     description?: string;
@@ -14,16 +18,12 @@ export type ComponentInfo = {
     name: string;
     cover?: string;
     version?: string;
-    props?: Record<string, ComponentProps>;
+    props?: Record<string, ComponentPropsExplain>;
     events?: Record<string, {
         name?: string;
         description?: string;
     }>;
-    deps?: Record<string, string>;
 };
-type AppActionRef = React.MutableRefObject<{
-    updateProps: (props: Record<string, any>) => void;
-} | undefined>;
 export interface MojitoComponent<T> {
     framework?: {
         name: string;

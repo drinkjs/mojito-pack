@@ -1,49 +1,77 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
-export interface MojitoComponentProps {
-	$display: "editor" | "viewer";
-	$style?: React.CSSProperties;
-}
-
-export type ComponentProps = {
-	name: string;
-	type: "string" | "number" | "boolean" | "object" | "array";
-	description?: string;
-	default?: any;
-};
-
-export type ComponentInfo = {
-	name: string;
-	cover?: string;
-	version?: string;
-	props?: Record<string, ComponentProps>;
-	events?: Record<
-		string,
-		{
-			name?: string;
-			description?: string;
-		}
-	>;
-	deps?: Record<string, string>;
-};
 
 type AppActionRef =  React.MutableRefObject<{updateProps: (props: Record<string, any>) => void} | undefined>
 
-export interface MojitoComponent<T> {
-	framework?: {
-		name: string;
-		version: string;
-	};
-	mount(container: Element | DocumentFragment, props?: any): void;
-	unmount(): void;
-	setProps(newProps: any): void;
-	getProps(): Record<string, any> | undefined;
-	getDefaultProps(): Record<string, any> | undefined;
-	readonly component: T;
-	readonly componentInfo: ComponentInfo;
-	readonly componentId: string;
+export interface MojitoComponentProps {
+  $display: "editor" | "viewer";
+  $style: Record<string, any>;
+  $updateProps: (props:Record<string, any>)=>void
 }
+
+export type ComponentPropsExplain = {
+  name: string;
+  type: "string" | "number" | "boolean" | "object" | "array";
+  description?: string;
+  default?: any;
+};
+
+export type ComponentInfo = {
+  name: string;
+  cover?: string;
+  version?: string;
+  props?: Record<string, ComponentPropsExplain>;
+  events?: Record<
+    string,
+    {
+      name?: string;
+      description?: string;
+    }
+  >;
+};
+
+export interface MojitoComponent<T> {
+  framework?: {
+    name: string;
+    version: string;
+  };
+  mount(container: Element | DocumentFragment, props?: any): void;
+  unmount(): void;
+  setProps(newProps: any): void;
+  getProps(): Record<string, any> | undefined;
+  getDefaultProps(): Record<string, any> | undefined;
+  readonly component: T;
+  readonly componentInfo: ComponentInfo;
+  readonly componentId: string;
+}
+
+const App: React.FC<{
+	component: any;
+	props?: any;
+	onMount?: (props?: Record<string, any>) => void;
+	appRef?: AppActionRef;
+}> = ({ component: Comp, props, appRef, onMount }) => {
+	const [currProps, setCurrProps] = useState(props);
+
+	useImperativeHandle(
+		appRef,
+		() => ({
+			updateProps:(props:Record<string, any>)=>{
+				setCurrProps(props)
+			}
+		}),
+		[currProps]
+	);
+
+	useEffect(() => {
+		if (onMount) {
+			onMount(props);
+		}
+	}, []);
+
+	return <Comp {...currProps} />;
+};
 
 export function CreatePack<T extends object>(
 	component: T,
@@ -129,30 +157,3 @@ export function CreatePack<T extends object>(
 		}
 	};
 }
-
-const App: React.FC<{
-	component: any;
-	props?: any;
-	onMount?: (props?: Record<string, any>) => void;
-	appRef?: AppActionRef;
-}> = ({ component: Comp, props, appRef, onMount }) => {
-	const [currProps, setCurrProps] = useState(props);
-
-	useImperativeHandle(
-		appRef,
-		() => ({
-			updateProps:(props:Record<string, any>)=>{
-				setCurrProps(props)
-			}
-		}),
-		[currProps]
-	);
-
-	useEffect(() => {
-		if (onMount) {
-			onMount(props);
-		}
-	}, []);
-
-	return <Comp {...currProps} />;
-};

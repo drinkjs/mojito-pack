@@ -2,6 +2,20 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
+const App = ({ component: Comp, props, appRef, onMount }) => {
+    const [currProps, setCurrProps] = useState(props);
+    useImperativeHandle(appRef, () => ({
+        updateProps: (props) => {
+            setCurrProps(props);
+        }
+    }), [currProps]);
+    useEffect(() => {
+        if (onMount) {
+            onMount(props);
+        }
+    }, []);
+    return _jsx(Comp, Object.assign({}, currProps));
+};
 export function CreatePack(component, componentInfo) {
     const componentId = nanoid();
     return class MojitoPack {
@@ -66,17 +80,3 @@ export function CreatePack(component, componentInfo) {
         }
     };
 }
-const App = ({ component: Comp, props, appRef, onMount }) => {
-    const [currProps, setCurrProps] = useState(props);
-    useImperativeHandle(appRef, () => ({
-        updateProps: (props) => {
-            setCurrProps(props);
-        }
-    }), [currProps]);
-    useEffect(() => {
-        if (onMount) {
-            onMount(props);
-        }
-    }, []);
-    return _jsx(Comp, Object.assign({}, currProps));
-};

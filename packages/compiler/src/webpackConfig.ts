@@ -85,6 +85,10 @@ export default (
 				{
 					test: /\.vue$/,
 					use: [
+						// {
+						// 	loader: path.resolve(__dirname, "../router-loader"),
+						// 	options: { isVue: true },
+						// },
 						{
 							loader: path.resolve(__dirname, "../node_modules/vue-loader"),
 							options: { hotReload: false },

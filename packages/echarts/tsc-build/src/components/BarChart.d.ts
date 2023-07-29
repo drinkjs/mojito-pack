@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ChartProps } from "../common/ChartContainer";
 type BarChartData = {
     name: string;
@@ -11,9 +12,11 @@ declare const _default: new () => {
     __component: typeof BarChart;
     __info: import("@mojito/react-pack").ComponentInfo;
     __root: import("react-dom/client").Root | null;
-    __eventer: EventTarget | null;
     __props?: Record<string, any> | undefined;
     __id: string;
+    __ref: import("react").MutableRefObject<{
+        updateProps: (props: Record<string, any>) => void;
+    } | undefined>;
     framework: {
         name: string;
         version: string;
@@ -23,8 +26,7 @@ declare const _default: new () => {
     readonly componentId: string;
     mount(container: Element | DocumentFragment, props?: Record<string, any> | undefined, onMount?: ((props?: Record<string, any> | undefined) => void) | undefined): void;
     unmount(): void;
-    setProps(newProps: any): void;
-    setEvent(eventName: string, callback: (...args: any[]) => any, thisArg?: any): void;
+    setProps(newProps: Record<string, any>): void;
     getProps(): Record<string, any> | undefined;
     getDefaultProps(): any;
 };

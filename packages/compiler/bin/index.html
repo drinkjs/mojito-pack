@@ -28,7 +28,7 @@ sys.import("./mojito-element.js").then((data)=>{
         const comp = new Component()
         console.log(comp)
         if(comp.mount && comp.component){
-        let props = {}
+        let props = {onClick: ()=>{alert("fdfdfd")}}
         const {componentInfo} = comp
         if(componentInfo && componentInfo.props){
           Object.keys(componentInfo.props).forEach((key)=>{

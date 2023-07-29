@@ -1,0 +1,1 @@
+export const components = async ()=> (await import("./src/components/index.vue")).default;

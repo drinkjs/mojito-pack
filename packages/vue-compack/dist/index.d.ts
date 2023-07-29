@@ -1,9 +1,10 @@
 import * as Vue from "vue";
 export interface MojitoComponentProps {
     $display: "editor" | "viewer";
-    $style?: Record<string, any>;
+    $style: Record<string, any>;
+    $updateProps: (props: Record<string, any>) => void;
 }
-export type ComponentProps = {
+export type ComponentPropsExplain = {
     name: string;
     type: "string" | "number" | "boolean" | "object" | "array";
     description?: string;
@@ -13,12 +14,11 @@ export type ComponentInfo = {
     name: string;
     cover?: string;
     version?: string;
-    props?: Record<string, ComponentProps>;
+    props?: Record<string, ComponentPropsExplain>;
     events?: Record<string, {
         name?: string;
         description?: string;
     }>;
-    deps?: Record<string, string>;
 };
 export interface MojitoComponent<T> {
     framework?: {

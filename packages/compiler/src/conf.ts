@@ -1,0 +1,1 @@
+export const EntryFile = "./mojito_entry.ts"
