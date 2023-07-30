@@ -10,7 +10,7 @@ export interface ChartProps<T=any> extends MojitoComponentProps {
   data?:T
 } 
 
-export default function ChartContainer({option, style, className, theme, $style, ...restProps}: ChartProps) {
+export default function ChartContainer({option, style, className, theme, __style, ...restProps}: ChartProps) {
 	const container = useRef<HTMLDivElement | null>(null);
   const chart = useRef<echarts.ECharts | null>(null);
 
@@ -27,7 +27,7 @@ export default function ChartContainer({option, style, className, theme, $style,
 
   useEffect(()=>{
     chart.current?.resize();
-  }, [style, $style?.width, $style?.height, className])
+  }, [style, __style?.width, __style?.height, className])
 
 	return <div {...restProps} className={className} style={{width:"100%", height:"100%", ...style}} ref={container}></div>;
 }
