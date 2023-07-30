@@ -137,7 +137,7 @@ export function devServer(config: MojitoCompilerConfig) {
 			JSON.stringify(externalInfo.cdn)
 		);
 	}
-	template = template.replace("IMPORT_FILE", conf.output?.filename as string);
+	template = template.replace("IMPORT_FILE", conf.output?.filename as string).replace("PkgName", pkg.name).replace("PkgVersion", pkg.version);
 	fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
 
 	// compiler.hooks.watchRun.tap("WatchRun", (comp) => {

@@ -7,6 +7,11 @@ import { EsbuildPlugin } from "esbuild-loader";
 import { BasePack, MojitoCompilerConfig } from "./conf";
 
 const progress = new webpack.ProgressPlugin();
+const cwd = process.cwd();
+
+function loaderPath(loader:string){
+	return path.resolve(__dirname, `../node_modules/${loader}`)
+}
 
 export default (
 	config: MojitoCompilerConfig,
@@ -20,8 +25,8 @@ export default (
 	}
 
 	const outPath = config.output.path
-		? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}`
-		: `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
+		? `${cwd}/${config.output.path}/${pkg.name}@${pkg.version}`
+		: `${cwd}/dist/${pkg.name}@${pkg.version}`;
 	config.output.path = outPath;
 
 	const plugins: any[] = [];
@@ -75,7 +80,7 @@ export default (
 					test: /\.vue$/,
 					use: [
 						{
-							loader: path.resolve(__dirname, "../node_modules/vue-loader"),
+							loader: loaderPath("vue-loader"),
 							options: { hotReload: false },
 						},
 					],
@@ -88,7 +93,7 @@ export default (
 						// 	options: { appendTsSuffixTo: [/\.vue$/] },
 						// },
 						{
-							loader: path.resolve(__dirname, "../node_modules/esbuild-loader"),
+							loader: loaderPath("esbuild-loader"),
 							options: {
 								// JavaScript version to compile to
 								target: "es2015",
@@ -102,7 +107,7 @@ export default (
 					test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
 					use: [
 						{
-							loader: path.resolve(__dirname, "../node_modules/url-loader"),
+							loader: loaderPath("url-loader"),
 							options: {
 								limit: 8192,
 								publicPath: "",
@@ -110,6 +115,44 @@ export default (
 								esModule: false,
 							},
 						},
+					],
+				},
+				{
+					test: /(?<!\.module)\.css$/i,
+					use: [
+						{
+							loader: loaderPath("mojito-vue-style-loader"),
+							// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
+							options: {
+								pkg,
+							}
+						},
+						{
+							loader: loaderPath("css-loader"),
+							options: { importLoaders: 1 },
+						},
+						{
+							loader: loaderPath("postcss-loader")
+						}
+					],
+				},
+				{
+					test: /\.module\.css$/i,
+					use: [
+						{
+							loader: loaderPath("mojito-vue-style-loader"),
+							// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
+							options: {
+								pkg,
+							}
+						},
+						{
+							loader: loaderPath("css-loader"),
+							options: { importLoaders: 1, modules: true },
+						},
+						{
+							loader: loaderPath("postcss-loader")
+						}
 					],
 				},
 			],

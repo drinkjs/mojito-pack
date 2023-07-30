@@ -103,6 +103,7 @@ export function CreatePack<T extends object>(
 			this.__props = { ...this.getDefaultProps(), ...props };
 			const self = this;
 			this.__root = createApp({
+				shadowRoot: container.parentNode,
 				setup() {
 					const componentRef = ref();
 					onMounted(() => {

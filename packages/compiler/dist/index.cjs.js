@@ -56,6 +56,10 @@ var BasePack;
 })(BasePack || (BasePack = {}));
 
 const progress = new webpack.ProgressPlugin();
+const cwd = process.cwd();
+function loaderPath(loader) {
+    return path.resolve(__dirname, `../node_modules/${loader}`);
+}
 var webpackConfig = (config, pkg, { isDev, basePack }) => {
     var _a, _b;
     const { entry } = config;
@@ -63,8 +67,8 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
         config.output = {};
     }
     const outPath = config.output.path
-        ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}`
-        : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
+        ? `${cwd}/${config.output.path}/${pkg.name}@${pkg.version}`
+        : `${cwd}/dist/${pkg.name}@${pkg.version}`;
     config.output.path = outPath;
     const plugins = [];
     if (isDev) {
@@ -112,7 +116,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     test: /\.vue$/,
                     use: [
                         {
-                            loader: path.resolve(__dirname, "../node_modules/vue-loader"),
+                            loader: loaderPath("vue-loader"),
                             options: { hotReload: false },
                         },
                     ],
@@ -125,7 +129,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                         // 	options: { appendTsSuffixTo: [/\.vue$/] },
                         // },
                         {
-                            loader: path.resolve(__dirname, "../node_modules/esbuild-loader"),
+                            loader: loaderPath("esbuild-loader"),
                             options: {
                                 // JavaScript version to compile to
                                 target: "es2015",
@@ -139,7 +143,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
                     use: [
                         {
-                            loader: path.resolve(__dirname, "../node_modules/url-loader"),
+                            loader: loaderPath("url-loader"),
                             options: {
                                 limit: 8192,
                                 publicPath: "",
@@ -147,6 +151,44 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                                 esModule: false,
                             },
                         },
+                    ],
+                },
+                {
+                    test: /(?<!\.module)\.css$/i,
+                    use: [
+                        {
+                            loader: loaderPath("mojito-vue-style-loader"),
+                            // loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
+                            options: {
+                                pkg,
+                            }
+                        },
+                        {
+                            loader: loaderPath("css-loader"),
+                            options: { importLoaders: 1 },
+                        },
+                        {
+                            loader: loaderPath("postcss-loader")
+                        }
+                    ],
+                },
+                {
+                    test: /\.module\.css$/i,
+                    use: [
+                        {
+                            loader: loaderPath("mojito-vue-style-loader"),
+                            // loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
+                            options: {
+                                pkg,
+                            }
+                        },
+                        {
+                            loader: loaderPath("css-loader"),
+                            options: { importLoaders: 1, modules: true },
+                        },
+                        {
+                            loader: loaderPath("postcss-loader")
+                        }
                     ],
                 },
             ],
@@ -520,7 +562,7 @@ function devServer(config) {
     if (externalInfo) {
         template = template.replace("{/* IMPORT_MAP */}", JSON.stringify(externalInfo.cdn));
     }
-    template = template.replace("IMPORT_FILE", (_b = conf.output) === null || _b === void 0 ? void 0 : _b.filename);
+    template = template.replace("IMPORT_FILE", (_b = conf.output) === null || _b === void 0 ? void 0 : _b.filename).replace("PkgName", pkg.name).replace("PkgVersion", pkg.version);
     fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
     // compiler.hooks.watchRun.tap("WatchRun", (comp) => {
     // 	if (comp.modifiedFiles) {

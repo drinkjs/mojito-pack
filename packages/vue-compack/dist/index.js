@@ -48,6 +48,7 @@ export function CreatePack(component, componentInfo) {
             this.__props = Object.assign(Object.assign({}, this.getDefaultProps()), props);
             const self = this;
             this.__root = createApp({
+                shadowRoot: container.parentNode,
                 setup() {
                     const componentRef = ref();
                     onMounted(() => {

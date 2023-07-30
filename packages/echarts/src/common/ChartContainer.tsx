@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import * as echarts from "echarts";
 import { MojitoComponentProps } from "@mojito/react-pack/dist";
-
+import styles from "./index.module.css";
 export interface ChartProps<T=any> extends MojitoComponentProps {
   option?: echarts.EChartsCoreOption;
 	style?: React.CSSProperties;
@@ -29,5 +29,5 @@ export default function ChartContainer({option, style, className, theme, __style
     chart.current?.resize();
   }, [style, __style?.width, __style?.height, className])
 
-	return <div {...restProps} className={className} style={{width:"100%", height:"100%", ...style}} ref={container}></div>;
+	return <div {...restProps} className={`${styles.root} ${className}`} style={{...style}} ref={container} />;
 }

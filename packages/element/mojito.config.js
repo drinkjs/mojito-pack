@@ -6,18 +6,18 @@ module.exports = {
 		// "echarts": ['https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.2/echarts.min.js', 'echarts'],
 	},
 	module: {
-		rules: [
-			{
-				test: /\.css$/,
-				use: [
-					"vue-style-loader",
-					{
-						loader: "css-loader",
-						options: { importLoaders: 1 },
-					},
-					"postcss-loader",
-				],
-			},
-		],
+		// rules: [
+		// 	{
+		// 		test: /\.css$/,
+		// 		use: [
+		// 			"vue-style-loader",
+		// 			{
+		// 				loader: "css-loader",
+		// 				options: { importLoaders: 1 },
+		// 			},
+		// 			"postcss-loader",
+		// 		],
+		// 	},
+		// ],
 	},
 };

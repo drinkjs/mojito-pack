@@ -8,9 +8,11 @@
   <title>Document</title>
 </head>
 <body>
-  
+  <div id="app" data-mojito-render="PkgName@PkgVersion"></div>
 </body>
 <script>
+const app = document.getElementById("app");
+const shadow  = app.attachShadow({ mode: "open" });
 
 const sys = new System.constructor();
 sys.addImportMap({
@@ -40,10 +42,11 @@ sys.import("./IMPORT_FILE").then((data)=>{
         box.style.width = "500px";
         box.style.height = "300px";
         box.style.padding = "16px";
-        document.body.appendChild(box);
+        shadow.appendChild(box);
         comp.mount(box, props)
         setTimeout(()=>{
           comp.setProps({text:"4444444444444"})
+          console.log(box.parentNode)
         }, 5000)
       }
     })
