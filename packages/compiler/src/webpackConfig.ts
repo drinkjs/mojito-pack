@@ -122,7 +122,6 @@ export default (
 					use: [
 						{
 							loader: loaderPath("mojito-vue-style-loader"),
-							// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
 							options: {
 								pkg,
 							}
@@ -141,7 +140,6 @@ export default (
 					use: [
 						{
 							loader: loaderPath("mojito-vue-style-loader"),
-							// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
 							options: {
 								pkg,
 							}
