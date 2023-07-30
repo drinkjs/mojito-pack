@@ -27,7 +27,7 @@ export default function ChartContainer({option, style, className, theme, $style,
 
   useEffect(()=>{
     chart.current?.resize();
-  }, [style, $style.width, $style.height, className])
+  }, [style, $style?.width, $style?.height, className])
 
 	return <div {...restProps} className={className} style={{width:"100%", height:"100%", ...style}} ref={container}></div>;
 }

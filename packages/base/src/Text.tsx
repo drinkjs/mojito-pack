@@ -16,7 +16,7 @@ function Text({ text, $display, $style, $updateProps }: TextProps) {
 
   const onBlur = useCallback(()=>{
     setInput(false);
-    $updateProps({text: inputText});
+    $updateProps && $updateProps({text: inputText});
   }, [inputText])
 
 	if ($display === "viewer" || !isInput) {

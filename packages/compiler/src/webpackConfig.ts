@@ -3,32 +3,44 @@ import { merge } from "webpack-merge";
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
+import { EsbuildPlugin } from "esbuild-loader";
+import { BasePack, MojitoCompilerConfig } from "./conf";
 
 const progress = new webpack.ProgressPlugin();
 
 export default (
-	config: webpack.Configuration,
+	config: MojitoCompilerConfig,
 	pkg: any,
-	isDev?: boolean
-): webpack.Configuration => {
-	let entry: any = config.entry;
-	if (typeof config.entry === "string") {
-		entry = config.entry;
-	} else if (Array.isArray(config.entry)) {
-	} else if (typeof config.entry === "object") {
-		let main = `${process.cwd()}/${config.entry.main}`;
-		entry = { ...config.entry, main };
-	}
+	{ isDev, basePack }: { isDev?: boolean; basePack?: BasePack }
+): MojitoCompilerConfig => {
+	const { entry } = config;
 
 	if (!config.output) {
 		config.output = {};
 	}
+
 	const outPath = config.output.path
 		? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}`
 		: `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
 	config.output.path = outPath;
 
-	const baseConfig: webpack.Configuration = {
+	const plugins: any[] = [];
+	if (isDev) {
+		plugins.push(
+			new HtmlWebpackPlugin({
+				template: path.resolve(__dirname, "./index.html"),
+				inject: false,
+			})
+		);
+	} else {
+		plugins.push(progress);
+	}
+
+	if (basePack === BasePack.vue) {
+		plugins.push(new VueLoaderPlugin());
+	}
+
+	const baseConfig: MojitoCompilerConfig = {
 		entry,
 		mode: isDev ? "development" : "production",
 		resolve: {
@@ -50,50 +62,41 @@ export default (
 		watchOptions: {
 			aggregateTimeout: 800,
 		},
-		plugins: isDev
-			? [
-					new HtmlWebpackPlugin({
-						template: path.resolve(__dirname, "./index.html"),
-						inject: false,
-					}),
-					new VueLoaderPlugin(),
-			  ]
-			: [progress, new VueLoaderPlugin()],
-		// optimization: {
-		//   splitChunks: {
-		//     cacheGroups: {
-		//       vendor: {
-		//         test: /[\\/]node_modules[\\/](react|react-dom|echarts)[\\/]/,
-		//         name: 'vendor',
-		//         chunks: 'all',
-		//       },
-		//     },
-		//   },
-		// },
+		plugins,
+		optimization: {
+			minimizer: [
+				// Use esbuild to minify
+				new EsbuildPlugin(),
+			],
+		},
 		module: {
 			rules: [
 				{
-					test: /\.tsx?$/,
-					use: [
-						{
-							loader: path.resolve(__dirname, "../node_modules/ts-loader"),
-							options: { appendTsSuffixTo: [/\.vue$/] },
-						},
-					],
-					exclude: /node_modules/,
-				},
-				{
 					test: /\.vue$/,
 					use: [
-						// {
-						// 	loader: path.resolve(__dirname, "../router-loader"),
-						// 	options: { isVue: true },
-						// },
 						{
 							loader: path.resolve(__dirname, "../node_modules/vue-loader"),
 							options: { hotReload: false },
 						},
 					],
+				},
+				{
+					test: /.[jt]sx?$/,
+					use: [
+						// {
+						// 	loader: path.resolve(__dirname, "../node_modules/ts-loader"),
+						// 	options: { appendTsSuffixTo: [/\.vue$/] },
+						// },
+						{
+							loader: path.resolve(__dirname, "../node_modules/esbuild-loader"),
+							options: {
+								// JavaScript version to compile to
+								target: "es2015",
+								loader: basePack === BasePack.vue ? "ts" : undefined,
+							},
+						},
+					],
+					// exclude: /node_modules/,
 				},
 				{
 					test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,

@@ -14,10 +14,10 @@
 
 const sys = new System.constructor();
 sys.addImportMap({
-  "imports": {}
+  "imports": {"echarts":"https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.2/echarts.min.js"}
 })
 
-sys.import("./mojito-element.js").then((data)=>{
+sys.import("./mojito-echarts.js").then((data)=>{
   console.log(data);
 
   for(const key in data){

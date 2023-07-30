@@ -12,7 +12,7 @@ import {
 	Identifier,
 	ObjectLiteralExpression,
 } from "ts-morph";
-import { EntryFile } from "./conf";
+import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
 
 type ExportComponent = {export:string, name:string}
 
@@ -186,10 +186,10 @@ export function parseTs(tsEntry: string, enptyPath:string) {
 	return parseAST(tsEntry);
 }
 
-export function parseEntry(entry:string, filepath:string){
-  if(entry.includes(".vue")){
+export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
+  if(basePack === BasePack.vue){
     return parseVue(filepath);
-  }else if(entry.includes(".ts") || entry.includes(".tsx")){
+  }else if(basePack === BasePack.react){
     return parseTs(entry, filepath)
   }else{
     throw new Error(`Cannot be identified ${entry}`)
@@ -203,11 +203,14 @@ export function parseEntry(entry:string, filepath:string){
  * @param entryPath 入口文件路径
  * @param isHot 是否为热更新
  */
- export function createEntry(entry: string, isHot?: boolean) {
+ export function createEntry({entry}: MojitoCompilerConfig, opts:{basePack?:BasePack, isHot?:boolean}) {
+
+	const {basePack, isHot} = opts;
+
   const parsePath = entry.substring(0, entry.indexOf("*"));
 	const entpryPath = path.resolve(process.cwd(), parsePath);
 
-	const allComponents = parseEntry(entry, entpryPath);
+	const allComponents = parseEntry(entry, entpryPath, basePack);
 	if(!allComponents || allComponents.length === 0) return [];
 
 	let exportArr:any[] = [];	
@@ -266,4 +269,32 @@ export function parseEntry(entry:string, filepath:string){
 	fs.writeFileSync(EntryFile, exportArr.join("\n"));
 
 	return exportComponents;
+}
+
+
+/**
+ * 解释externals参数，获取依赖
+ * @param configExternals
+ * @returns
+ */
+ export function parseExternals(configExternals: any) {
+	const externals: Record<string, string> = {};
+	const cdn: Record<string, string> = {};
+	const confExternals: any = configExternals;
+	if (Array.isArray(confExternals)) {
+		throw new Error(
+			"请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}"
+		);
+	} else if (typeof confExternals === "object") {
+		for (const key in confExternals) {
+			if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
+				throw new Error(
+					"请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}"
+				);
+			}
+			externals[key] = confExternals[key][1] || key;
+			cdn[externals[key]] = confExternals[key][0];
+		}
+	}
+	return { externals, cdn };
 }

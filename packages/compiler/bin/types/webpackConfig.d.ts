@@ -1,3 +1,6 @@
-import webpack from "webpack";
-declare const _default: (config: webpack.Configuration, pkg: any, isDev?: boolean) => webpack.Configuration;
+import { BasePack, MojitoCompilerConfig } from "./conf";
+declare const _default: (config: MojitoCompilerConfig, pkg: any, { isDev, basePack }: {
+    isDev?: boolean | undefined;
+    basePack?: BasePack | undefined;
+}) => MojitoCompilerConfig;
 export default _default;

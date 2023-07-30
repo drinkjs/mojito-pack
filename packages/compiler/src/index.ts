@@ -3,43 +3,20 @@ import WebpackDevServer from "webpack-dev-server";
 import webpackConfig from "./webpackConfig";
 import path from "path";
 import fs from "fs";
-// import { rimrafSync } from "rimraf";
-import { createEntry } from "./parser";
-import { EntryFile } from "./conf";
+import { createEntry, parseExternals } from "./parser";
+import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
 
 const pkg = require(`${process.cwd()}/package.json`);
 pkg.name = pkg.name.replace(/[\\\/]/g, "-");
 
-/**
- * 解释externals参数，获取依赖
- * @param configExternals
- * @returns
- */
-function parseExternals(configExternals: any) {
-	const externals: Record<string, string> = {};
-	const cdn: Record<string, string> = {};
-	const confExternals: any = configExternals;
-	if (Array.isArray(confExternals)) {
-		throw new Error(
-			"请配置正确的externals, 格式：{ react: [react cdn, 'react'], lodash: [lodash cdn, '_'] ...}"
-		);
-	} else if (typeof confExternals === "object") {
-		for (const key in confExternals) {
-			if (!Array.isArray(confExternals[key]) || confExternals[key].length < 1) {
-				throw new Error(
-					"请配置正确的externals, 格式：{ react: [react cdn], lodash: [lodash cdn, '_'] ...}"
-				);
-			}
-			externals[key] = confExternals[key][1] || key;
-			cdn[externals[key]] = confExternals[key][0];
-		}
+function checkBase() {
+	const { dependencies, devDependencies } = pkg;
+	const allDep = { ...dependencies, ...devDependencies };
+	if (allDep["@mojito/vue-pack"]) {
+		return BasePack.vue;
+	} else if (allDep["@mojito/react-pack"]) {
+		return BasePack.react;
 	}
-	return { externals, cdn };
-}
-
-function isVue(vueFile:string | string[]){
-	const file = typeof vueFile === "string" ? vueFile : vueFile[0]
-	return file?.substring(vueFile.length - 3) === "vue"
 }
 
 /**
@@ -48,7 +25,8 @@ function isVue(vueFile:string | string[]){
  * @param isDev
  * @returns
  */
-function createCompiler(config: webpack.Configuration, isDev?: boolean) {
+function createCompiler(config: MojitoCompilerConfig, isDev?: boolean) {
+	const basePack = checkBase();
 	const externalInfo = config.externals
 		? parseExternals(config.externals)
 		: undefined;
@@ -57,14 +35,14 @@ function createCompiler(config: webpack.Configuration, isDev?: boolean) {
 		config.externals = externalInfo.externals;
 	}
 
-	const exportComponents = createEntry(config.entry as string);
-	const conf = webpackConfig(config, pkg, isDev);
-	conf.entry =  EntryFile;
-	const compiler = webpack(conf);
+	const exportComponents = createEntry(config, { basePack });
+	config = webpackConfig(config, pkg, { isDev, basePack });
+	config.entry = EntryFile;
+	delete config.template;
+	const compiler = webpack(config);
 
-	return { compiler, conf, exportComponents, externalInfo };
+	return { compiler, conf: config, exportComponents, externalInfo };
 }
-
 
 /**
  * 把真实文件系统转换到memfs系统
@@ -105,10 +83,9 @@ function createCompiler(config: webpack.Configuration, isDev?: boolean) {
  * @param config
  * @param callback
  */
-export function production(
-	config: webpack.Configuration,
-) {
-	const { compiler, conf, exportComponents, externalInfo } = createCompiler(config);
+export function production(config: MojitoCompilerConfig) {
+	const { compiler, conf, exportComponents, externalInfo } =
+		createCompiler(config);
 
 	compiler.run((err, stats) => {
 		if (err || stats?.hasErrors()) {
@@ -125,7 +102,7 @@ export function production(
 				if (exportComponents.length === 0) {
 					throw new Error("No Export Components");
 				}
-		
+
 				fs.writeFileSync(
 					`${conf!.output!.path}/mojito-pack.json`,
 					JSON.stringify({
@@ -135,7 +112,6 @@ export function production(
 						components: exportComponents,
 					})
 				);
-
 			} else {
 				console.error(closeErr);
 			}
@@ -147,16 +123,21 @@ export function production(
  * 启动WebpackDevServer
  * @param config
  */
-export function devServer(config: webpack.Configuration) {
+export function devServer(config: MojitoCompilerConfig) {
 	const { compiler, conf, externalInfo } = createCompiler(config, true);
 	// 读取模版内容, 并替换importMap和import file内容
-	let template = fs.readFileSync(path.resolve(__dirname, "./template.html")).toString()
-	if(externalInfo){
-		template = template.replace("{/* IMPORT_MAP */}", JSON.stringify(externalInfo.cdn));
+	let template = fs
+		.readFileSync(config.template ?? path.resolve(__dirname, "./template.html"))
+		.toString();
+	if (externalInfo) {
+		template = template.replace(
+			"{/* IMPORT_MAP */}",
+			JSON.stringify(externalInfo.cdn)
+		);
 	}
 	template = template.replace("IMPORT_FILE", conf.output?.filename as string);
 	fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
-	
+
 	// compiler.hooks.watchRun.tap("WatchRun", (comp) => {
 	// 	if (comp.modifiedFiles) {
 	// 		// 监听修改的文件重新编译

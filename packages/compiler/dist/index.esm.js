@@ -9,6 +9,7 @@ import { merge } from 'webpack-merge';
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
+import { EsbuildPlugin } from 'esbuild-loader';
 import fs from 'fs';
 import { parse } from '@vue/compiler-sfc';
 import { Project } from 'ts-morph';
@@ -45,18 +46,17 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 
+const EntryFile = "./mojito_entry.ts";
+var BasePack;
+(function (BasePack) {
+    BasePack["vue"] = "vue";
+    BasePack["react"] = "react";
+})(BasePack || (BasePack = {}));
+
 const progress = new webpack.ProgressPlugin();
-var webpackConfig = (config, pkg, isDev) => {
+var webpackConfig = (config, pkg, { isDev, basePack }) => {
     var _a, _b;
-    let entry = config.entry;
-    if (typeof config.entry === "string") {
-        entry = config.entry;
-    }
-    else if (Array.isArray(config.entry)) ;
-    else if (typeof config.entry === "object") {
-        let main = `${process.cwd()}/${config.entry.main}`;
-        entry = Object.assign(Object.assign({}, config.entry), { main });
-    }
+    const { entry } = config;
     if (!config.output) {
         config.output = {};
     }
@@ -64,6 +64,19 @@ var webpackConfig = (config, pkg, isDev) => {
         ? `${process.cwd()}/${config.output.path}/${pkg.name}@${pkg.version}`
         : `${process.cwd()}/dist/${pkg.name}@${pkg.version}`;
     config.output.path = outPath;
+    const plugins = [];
+    if (isDev) {
+        plugins.push(new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, "./index.html"),
+            inject: false,
+        }));
+    }
+    else {
+        plugins.push(progress);
+    }
+    if (basePack === BasePack.vue) {
+        plugins.push(new VueLoaderPlugin());
+    }
     const baseConfig = {
         entry,
         mode: isDev ? "development" : "production",
@@ -84,50 +97,41 @@ var webpackConfig = (config, pkg, isDev) => {
         watchOptions: {
             aggregateTimeout: 800,
         },
-        plugins: isDev
-            ? [
-                new HtmlWebpackPlugin({
-                    template: path.resolve(__dirname, "./index.html"),
-                    inject: false,
-                }),
-                new VueLoaderPlugin(),
-            ]
-            : [progress, new VueLoaderPlugin()],
-        // optimization: {
-        //   splitChunks: {
-        //     cacheGroups: {
-        //       vendor: {
-        //         test: /[\\/]node_modules[\\/](react|react-dom|echarts)[\\/]/,
-        //         name: 'vendor',
-        //         chunks: 'all',
-        //       },
-        //     },
-        //   },
-        // },
+        plugins,
+        optimization: {
+            minimizer: [
+                // Use esbuild to minify
+                new EsbuildPlugin(),
+            ],
+        },
         module: {
             rules: [
                 {
-                    test: /\.tsx?$/,
-                    use: [
-                        {
-                            loader: path.resolve(__dirname, "../node_modules/ts-loader"),
-                            options: { appendTsSuffixTo: [/\.vue$/] },
-                        },
-                    ],
-                    exclude: /node_modules/,
-                },
-                {
                     test: /\.vue$/,
                     use: [
-                        // {
-                        // 	loader: path.resolve(__dirname, "../router-loader"),
-                        // 	options: { isVue: true },
-                        // },
                         {
                             loader: path.resolve(__dirname, "../node_modules/vue-loader"),
                             options: { hotReload: false },
                         },
                     ],
+                },
+                {
+                    test: /.[jt]sx?$/,
+                    use: [
+                        // {
+                        // 	loader: path.resolve(__dirname, "../node_modules/ts-loader"),
+                        // 	options: { appendTsSuffixTo: [/\.vue$/] },
+                        // },
+                        {
+                            loader: path.resolve(__dirname, "../node_modules/esbuild-loader"),
+                            options: {
+                                // JavaScript version to compile to
+                                target: "es2015",
+                                loader: basePack === BasePack.vue ? "ts" : undefined,
+                            },
+                        },
+                    ],
+                    // exclude: /node_modules/,
                 },
                 {
                     test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
@@ -153,8 +157,6 @@ var webpackConfig = (config, pkg, isDev) => {
     (_b = mergedConfig.optimization) === null || _b === void 0 ? true : delete _b.splitChunks;
     return mergedConfig;
 };
-
-const EntryFile = "./mojito_entry.ts";
 
 const TempDir = "node_modules/@mojito/__pack";
 function getPathFiles(entry, extname) {
@@ -304,11 +306,11 @@ function parseTs(tsEntry, enptyPath) {
     };
     return parseAST(tsEntry);
 }
-function parseEntry(entry, filepath) {
-    if (entry.includes(".vue")) {
+function parseEntry(entry, filepath, basePack) {
+    if (basePack === BasePack.vue) {
         return parseVue(filepath);
     }
-    else if (entry.includes(".ts") || entry.includes(".tsx")) {
+    else if (basePack === BasePack.react) {
         return parseTs(entry);
     }
     else {
@@ -321,10 +323,11 @@ function parseEntry(entry, filepath) {
  * @param entryPath 入口文件路径
  * @param isHot 是否为热更新
  */
-function createEntry(entry, isHot) {
+function createEntry({ entry }, opts) {
+    const { basePack, isHot } = opts;
     const parsePath = entry.substring(0, entry.indexOf("*"));
     const entpryPath = path.resolve(process.cwd(), parsePath);
-    const allComponents = parseEntry(entry, entpryPath);
+    const allComponents = parseEntry(entry, entpryPath, basePack);
     if (!allComponents || allComponents.length === 0)
         return [];
     let exportArr = [];
@@ -380,9 +383,6 @@ function createEntry(entry, isHot) {
     fs.writeFileSync(EntryFile, exportArr.join("\n"));
     return exportComponents;
 }
-
-const pkg = require(`${process.cwd()}/package.json`);
-pkg.name = pkg.name.replace(/[\\\/]/g, "-");
 /**
  * 解释externals参数，获取依赖
  * @param configExternals
@@ -406,6 +406,19 @@ function parseExternals(configExternals) {
     }
     return { externals, cdn };
 }
+
+const pkg = require(`${process.cwd()}/package.json`);
+pkg.name = pkg.name.replace(/[\\\/]/g, "-");
+function checkBase() {
+    const { dependencies, devDependencies } = pkg;
+    const allDep = Object.assign(Object.assign({}, dependencies), devDependencies);
+    if (allDep["@mojito/vue-pack"]) {
+        return BasePack.vue;
+    }
+    else if (allDep["@mojito/react-pack"]) {
+        return BasePack.react;
+    }
+}
 /**
  * 创建webpack compiler
  * @param config
@@ -413,17 +426,19 @@ function parseExternals(configExternals) {
  * @returns
  */
 function createCompiler(config, isDev) {
+    const basePack = checkBase();
     const externalInfo = config.externals
         ? parseExternals(config.externals)
         : undefined;
     if (externalInfo) {
         config.externals = externalInfo.externals;
     }
-    const exportComponents = createEntry(config.entry);
-    const conf = webpackConfig(config, pkg, isDev);
-    conf.entry = EntryFile;
-    const compiler = webpack(conf);
-    return { compiler, conf, exportComponents, externalInfo };
+    const exportComponents = createEntry(config, { basePack });
+    config = webpackConfig(config, pkg, { isDev, basePack });
+    config.entry = EntryFile;
+    delete config.template;
+    const compiler = webpack(config);
+    return { compiler, conf: config, exportComponents, externalInfo };
 }
 /**
  * 把真实文件系统转换到memfs系统
@@ -493,14 +508,16 @@ function production(config) {
  * @param config
  */
 function devServer(config) {
-    var _a;
+    var _a, _b;
     const { compiler, conf, externalInfo } = createCompiler(config, true);
     // 读取模版内容, 并替换importMap和import file内容
-    let template = fs.readFileSync(path.resolve(__dirname, "./template.html")).toString();
+    let template = fs
+        .readFileSync((_a = config.template) !== null && _a !== void 0 ? _a : path.resolve(__dirname, "./template.html"))
+        .toString();
     if (externalInfo) {
         template = template.replace("{/* IMPORT_MAP */}", JSON.stringify(externalInfo.cdn));
     }
-    template = template.replace("IMPORT_FILE", (_a = conf.output) === null || _a === void 0 ? void 0 : _a.filename);
+    template = template.replace("IMPORT_FILE", (_b = conf.output) === null || _b === void 0 ? void 0 : _b.filename);
     fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
     // compiler.hooks.watchRun.tap("WatchRun", (comp) => {
     // 	if (comp.modifiedFiles) {

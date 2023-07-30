@@ -6,8 +6,8 @@ type AppActionRef =  React.MutableRefObject<{updateProps: (props: Record<string,
 
 export interface MojitoComponentProps {
   $display: "editor" | "viewer";
-  $style: Record<string, any>;
-  $updateProps: (props:Record<string, any>)=>void
+  $style?: Record<string, any>;
+  $updateProps?: (props:Record<string, any>)=>void
 }
 
 export type ComponentPropsExplain = {
