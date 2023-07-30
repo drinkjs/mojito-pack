@@ -187,7 +187,7 @@ function parseVue(filepath) {
     const buildpath = path.resolve(process.cwd(), TempDir);
     const files = getPathFiles(filepath, ".vue");
     if (fs.existsSync(buildpath)) {
-        fs.rmdirSync(buildpath, { recursive: true });
+        fs.rmSync(buildpath, { recursive: true });
     }
     fs.mkdirSync(buildpath, { recursive: true });
     files.forEach((v) => {
@@ -498,6 +498,7 @@ function production(config) {
                     external: externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn,
                     components: exportComponents,
                 }));
+                console.log('\x1b[32m%s\x1b[0m', "Build complete");
             }
             else {
                 console.error(closeErr);

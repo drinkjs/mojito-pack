@@ -51,7 +51,7 @@ export function parseVue(filepath: string) {
 	const files = getPathFiles(filepath, ".vue");
 
 	if (fs.existsSync(buildpath)) {
-		fs.rmdirSync(buildpath, { recursive: true });
+		fs.rmSync(buildpath, { recursive: true });
 	}
 	fs.mkdirSync(buildpath, { recursive: true });
 

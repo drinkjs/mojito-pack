@@ -112,6 +112,8 @@ export function production(config: MojitoCompilerConfig) {
 						components: exportComponents,
 					})
 				);
+				
+				console.log('\x1b[32m%s\x1b[0m', "Build complete")
 			} else {
 				console.error(closeErr);
 			}
