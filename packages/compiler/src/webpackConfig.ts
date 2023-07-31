@@ -45,6 +45,26 @@ export default (
 		plugins.push(new VueLoaderPlugin());
 	}
 
+	const getCssLoaders = (isModule:boolean, ...loaders:any[])=>{
+		return [
+			{
+				loader: loaderPath("mojito-vue-style-loader"),
+				// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
+				options: {
+					pkg,
+				}
+			},
+			{
+				loader: loaderPath("css-loader"),
+				options: { importLoaders: 1, modules: isModule },
+			},
+			{
+				loader: loaderPath("postcss-loader")
+			},
+			...loaders
+		]
+	}
+
 	const baseConfig: MojitoCompilerConfig = {
 		entry,
 		mode: isDev ? "development" : "production",
@@ -118,40 +138,31 @@ export default (
 					],
 				},
 				{
-					test: /(?<!\.module)\.css$/i,
-					use: [
-						{
-							loader: loaderPath("mojito-vue-style-loader"),
-							options: {
-								pkg,
-							}
-						},
-						{
-							loader: loaderPath("css-loader"),
-							options: { importLoaders: 1 },
-						},
-						{
-							loader: loaderPath("postcss-loader")
-						}
-					],
+					test: /\.css$/i,
+					exclude: /\.module\.css$/i,
+					use: getCssLoaders(false)
 				},
 				{
 					test: /\.module\.css$/i,
-					use: [
-						{
-							loader: loaderPath("mojito-vue-style-loader"),
-							options: {
-								pkg,
-							}
-						},
-						{
-							loader: loaderPath("css-loader"),
-							options: { importLoaders: 1, modules: true },
-						},
-						{
-							loader: loaderPath("postcss-loader")
-						}
-					],
+					use: getCssLoaders(true),
+				},
+				{
+					test: /\.less$/i,
+					exclude: /\.module\.less$/i,
+					use: getCssLoaders(false, "less-loader")
+				},
+				{
+					test: /\.module\.less$/i,
+					use: getCssLoaders(true, "less-loader"),
+				},
+				{
+					test: /\.scss$/i,
+					exclude: /\.module\.scss$/i,
+					use: getCssLoaders(false, "sass-loader")
+				},
+				{
+					test: /\.module\.scss$/i,
+					use: getCssLoaders(true, "sass-loader"),
 				},
 			],
 		},
