@@ -9,8 +9,13 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var vueLoader = require('vue-loader');
 var esbuildLoader = require('esbuild-loader');
 var fs = require('fs');
+require('systemjs');
 var compilerSfc = require('@vue/compiler-sfc');
 var tsMorph = require('ts-morph');
+var memfs = require('memfs');
+var http = require('http');
+var jsdom = require('jsdom');
+var detect = require('detect-port');
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -66,6 +71,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
         ? `${cwd}/${config.output.path}/${pkg.name}@${pkg.version}`
         : `${cwd}/dist/${pkg.name}@${pkg.version}`;
     config.output.path = outPath;
+    config.output.publicPath = isDev ? "" : `${config.output.publicPath || ""}/${pkg.name}@${pkg.version}/`;
     const plugins = [];
     if (isDev) {
         plugins.push(new HtmlWebpackPlugin({
@@ -109,9 +115,6 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
             clean: true,
             libraryTarget: "system",
             crossOriginLoading: "anonymous",
-            publicPath: isDev
-                ? ""
-                : `${config.output.publicPath || "/public"}/${pkg.name}@${pkg.version}/`,
             filename: `${pkg.name}.js`,
             chunkFilename: `${pkg.name}.[name].js`,
         },
@@ -121,8 +124,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
         plugins,
         optimization: {
             minimizer: [
-                // Use esbuild to minify
-                new esbuildLoader.EsbuildPlugin(),
+                new esbuildLoader.EsbuildPlugin({ target: 'es2020' }),
             ],
         },
         module: {
@@ -140,14 +142,13 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     test: /.[jt]sx?$/,
                     use: [
                         // {
-                        // 	loader: path.resolve(__dirname, "../node_modules/ts-loader"),
-                        // 	options: { appendTsSuffixTo: [/\.vue$/] },
+                        // 	loader: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js"
                         // },
                         {
                             loader: loaderPath("esbuild-loader"),
                             options: {
                                 // JavaScript version to compile to
-                                target: "es2015",
+                                target: "es2020",
                                 loader: basePack === BasePack.vue ? "ts" : undefined,
                             },
                         },
@@ -155,18 +156,9 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     // exclude: /node_modules/,
                 },
                 {
+                    use: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js",
                     test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
-                    use: [
-                        {
-                            loader: loaderPath("url-loader"),
-                            options: {
-                                limit: 8192,
-                                publicPath: "",
-                                name: "[name][hash].[ext]",
-                                esModule: false,
-                            },
-                        },
-                    ],
+                    type: 'asset/resource'
                 },
                 {
                     test: /\.css$/i,
@@ -331,24 +323,30 @@ function parseTs(tsEntry, enptyPath) {
                 // 组件名称
                 const component = arg1.getText();
                 // 组件props
-                const props = arg2;
+                // const props = arg2 as ObjectLiteralExpression;
                 // 保存组件信息
                 const componentInfo = { component };
                 // 第二个参数是对象，获取对象里的字段和值
-                const variables = props.getProperties();
-                variables.forEach((val) => {
-                    componentInfo[val.getName()] = val.getInitializerOrThrow().getText();
-                });
-                if (componentInfo.props) {
-                    componentInfo.props = componentInfo.props
-                        .replace(/\s/g, "")
-                        .replace("'", '"');
-                }
-                if (componentInfo.name) {
-                    // 名称不能为空
-                    componentInfo.name = componentInfo.name.replace(/['"]/g, "");
-                    return componentInfo;
-                }
+                // const variables =
+                // 	props.getProperties() as unknown as VariableDeclaration[];
+                // variables.forEach((val) => {
+                // 	const value = val.getInitializer()?.getText();
+                // 	if(value){
+                // 		componentInfo[val.getName()] = value;
+                // 	}
+                // });
+                // if (componentInfo.props) {
+                // 	componentInfo.props = componentInfo.props
+                // 		.replace(/\s/g, "")
+                // 		.replace("'", '"');
+                // }
+                // if (componentInfo.name) {
+                // 	// 名称不能为空
+                // 	componentInfo.name = componentInfo.name.replace(/['"]/g, "");
+                // 	return componentInfo;
+                // }
+                componentInfo.name = component.toString();
+                return componentInfo;
             }
         }
     };
@@ -411,7 +409,8 @@ function createEntry({ entry }, opts) {
                 else {
                     variable = exportName;
                 }
-                exportComponents.push({ export: variable, name: componentInfo[exportName].name });
+                const { name, category, cover } = componentInfo[exportName];
+                exportComponents.push({ export: variable, name, category, cover });
                 // 生成 export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
                 const exportText = `export const ${variable} = async ()=> (await import("./${importFile}")).${exportName};`;
                 if (!isHot) {
@@ -455,6 +454,79 @@ function parseExternals(configExternals) {
     return { externals, cdn };
 }
 
+const vol = new memfs.Volume();
+function createOutFs() {
+    return vol;
+}
+let port$1 = 3838;
+function createServer(outPath, publicPath, cb) {
+    const server = http.createServer((req, res) => {
+        if (req.url) {
+            try {
+                const filePath = req.url.replace(publicPath.substring(0, publicPath.length - 1), "");
+                const text = vol.readFileSync(`${outPath}${filePath}`).toString();
+                res.writeHead(200, { 'Content-Type': 'application/javascript' });
+                res.write(text);
+                res.end();
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+    });
+    server.on('listening', () => {
+        cb();
+    });
+    detect(port$1)
+        .then(_port => {
+        port$1 = _port;
+        server.listen(_port);
+    })
+        .catch(err => {
+        console.log(err);
+        process.exit(1);
+    });
+}
+function getComponentInfo(pkgName, pkgVersion, cdn) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("Get component info...");
+        const importMaps = Object.assign(Object.assign({}, cdn), { [pkgName]: `http://127.0.0.1:${port$1}/${pkgName}.js` });
+        const html = `
+		<html>
+		<head>
+			<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
+			<script>
+				System.addImportMap({
+					imports: ${JSON.stringify(importMaps)},
+				});
+				components= {}
+				async function load(){
+					const components = await System.import("${pkgName}");
+					for (const key in components) {
+						if (key !== "__esModule" && typeof components[key]) {
+							const comp = await components[key]();
+							components[key] = new comp
+						}
+					}
+          window.onComponents(components)
+				}
+				load()
+			</script>
+		</head>
+		<body>
+		</body>
+		</html>
+	`;
+        const { window } = new jsdom.JSDOM(html, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:${port$1}` });
+        return new Promise((resolve) => {
+            window.onComponents = (components) => {
+                console.log(components);
+                resolve(components);
+            };
+        });
+    });
+}
+
 const pkg = require(`${process.cwd()}/package.json`);
 pkg.name = pkg.name.replace(/[\\\/]/g, "-");
 function checkBase() {
@@ -486,41 +558,9 @@ function createCompiler(config, isDev) {
     config.entry = EntryFile;
     delete config.template;
     const compiler = webpack(config);
+    compiler.outputFileSystem = createOutFs();
     return { compiler, conf: config, exportComponents, externalInfo };
 }
-/**
- * 把真实文件系统转换到memfs系统
- * @param vol
- * @param rootPaths
- * @param parent
- */
-// function pathTree(vol: Volume, rootPaths: string[], parent?: string) {
-// 	rootPaths.forEach((rootPath) => {
-// 		const absPath = parent ? path.resolve(parent, rootPath) : rootPath;
-// 		const stat = fs.lstatSync(absPath);
-// 		if (!parent || stat.isDirectory()) {
-// 			// 创建memfs目录
-// 			const paths = fs.readdirSync(absPath);
-// 			if (!vol.existsSync(absPath)) {
-// 				vol.mkdirSync(absPath, { recursive: true });
-// 			}
-// 			pathTree(vol, paths, absPath);
-// 		} else if (stat.isFile()) {
-// 			// 创建memfs文件
-// 			const filePath = path.dirname(absPath);
-// 			if (!vol.existsSync(filePath)) {
-// 				vol.mkdirSync(filePath, { recursive: true });
-// 			}
-// 			vol.writeFileSync(absPath, fs.readFileSync(absPath).toString());
-// 		} else if (stat.isSymbolicLink()) {
-// 			// 创建memfs快捷方式
-// 			const linkPath = fs.readlinkSync(absPath);
-// 			const paths = fs.readdirSync(linkPath);
-// 			pathTree(vol, paths, linkPath);
-// 			vol.symlinkSync(linkPath, absPath);
-// 		}
-// 	});
-// }
 /**
  * 发布生产包
  * @param config
@@ -528,11 +568,57 @@ function createCompiler(config, isDev) {
  */
 function production(config) {
     const { compiler, conf, exportComponents, externalInfo } = createCompiler(config);
-    compiler.run((err, stats) => {
+    compiler.run((err, stats) => __awaiter(this, void 0, void 0, function* () {
         if (err || (stats === null || stats === void 0 ? void 0 : stats.hasErrors())) {
             console.error("\x1b[43m%s\x1b[0m", "Error:", (err === null || err === void 0 ? void 0 : err.message) || (stats === null || stats === void 0 ? void 0 : stats.compilation.errors));
             process.exit(1);
         }
+        createServer(config.output.path, config.output.publicPath, () => {
+            getComponentInfo(pkg.name, pkg.version, externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn);
+        });
+        // const file = fs.readFileSync(`${conf!.output!.path}/${pkg.name}.js`).toString();
+        // fs.writeFileSync(`${conf!.output!.path}/${pkg.name}.js`, `
+        // var self = {}
+        // var jsdom = require("jsdom");
+        // var { JSDOM } = jsdom;
+        // const { document } = new JSDOM("<!DOCTYPE html><p>Hello world</p>").window;
+        // ${file}`)
+        // 	let importMaps = {...externalInfo?.cdn}
+        // 	const run = `
+        // 	<html>
+        // 	<head>
+        // 		<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
+        // 		<script>
+        // 			System.addImportMap({
+        // 				imports: ${JSON.stringify(importMaps)},
+        // 			});
+        // 			window.mojito = {}
+        // 			async function load(){
+        // 				const components = await System.import("http://127.0.0.1:3838/public/mojito-echarts@1.0.1/mojito-echarts.js");
+        // 				for (const key in components) {
+        // 					if (key !== "__esModule" && typeof components[key]) {
+        // 						const comp = await components[key]();
+        // 						console.log("============================", comp);
+        // 						window.mojito[key] = new comp
+        // 					}
+        // 				}
+        // 			}
+        // 			load()
+        // 		</script>
+        // 	</head>
+        // 	<body>
+        // 	<script>document.body.appendChild(document.createElement("hr"));</script>
+        // 	</body>
+        // 	</html>
+        // `
+        // 	console.log(run)
+        // const { window } = new JSDOM(run, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:3838` });
+        // setTimeout(()=>{
+        // 	console.log(window.mojito)
+        // 	for(const key in window.mojito){
+        // 		console.log(window.mojito[key].__info)
+        // 	}
+        // }, 5000)
         compiler.close((closeErr) => {
             if (!closeErr) {
                 if (exportComponents.length === 0) {
@@ -550,7 +636,7 @@ function production(config) {
                 console.error(closeErr);
             }
         });
-    });
+    }));
 }
 /**
  * 启动WebpackDevServer

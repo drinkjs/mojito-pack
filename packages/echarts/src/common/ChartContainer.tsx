@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import * as echarts from "echarts";
-import { MojitoComponentProps } from "@mojito/react-pack/dist";
-import styles from "./index.module.css";
+import { MojitoComponentProps } from "@mojito/react-pack";
+import styles from "./index.module.less";
 export interface ChartProps<T=any> extends MojitoComponentProps {
   option?: echarts.EChartsCoreOption;
 	style?: React.CSSProperties;

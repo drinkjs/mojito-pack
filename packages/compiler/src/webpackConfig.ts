@@ -28,6 +28,7 @@ export default (
 		? `${cwd}/${config.output.path}/${pkg.name}@${pkg.version}`
 		: `${cwd}/dist/${pkg.name}@${pkg.version}`;
 	config.output.path = outPath;
+	config.output.publicPath = isDev ? "" : `${config.output.publicPath || ""}/${pkg.name}@${pkg.version}/`
 
 	const plugins: any[] = [];
 	if (isDev) {
@@ -76,11 +77,6 @@ export default (
 			clean: true,
 			libraryTarget: "system",
 			crossOriginLoading: "anonymous",
-			publicPath: isDev
-				? ""
-				: `${config.output.publicPath || "/public"}/${pkg.name}@${
-						pkg.version
-				  }/`,
 			filename: `${pkg.name}.js`,
 			chunkFilename: `${pkg.name}.[name].js`,
 		},
@@ -90,8 +86,7 @@ export default (
 		plugins,
 		optimization: {
 			minimizer: [
-				// Use esbuild to minify
-				new EsbuildPlugin(),
+				new EsbuildPlugin({target: 'es2020'}),
 			],
 		},
 		module: {
@@ -109,14 +104,13 @@ export default (
 					test: /.[jt]sx?$/,
 					use: [
 						// {
-						// 	loader: path.resolve(__dirname, "../node_modules/ts-loader"),
-						// 	options: { appendTsSuffixTo: [/\.vue$/] },
+						// 	loader: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js"
 						// },
 						{
 							loader: loaderPath("esbuild-loader"),
 							options: {
 								// JavaScript version to compile to
-								target: "es2015",
+								target: "es2020",
 								loader: basePack === BasePack.vue ? "ts" : undefined,
 							},
 						},
@@ -124,18 +118,9 @@ export default (
 					// exclude: /node_modules/,
 				},
 				{
+					use: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js",
 					test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
-					use: [
-						{
-							loader: loaderPath("url-loader"),
-							options: {
-								limit: 8192,
-								publicPath: "",
-								name: "[name][hash].[ext]",
-								esModule: false,
-							},
-						},
-					],
+					type: 'asset/resource'
 				},
 				{
 					test: /\.css$/i,

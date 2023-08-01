@@ -1,8 +1,9 @@
 import { merge } from "lodash-es";
 import { useMemo } from "react";
 import * as echarts from "echarts";
-import { CreatePack } from "@mojito/react-pack";
+import { ComponentInfo, CreatePack } from "@mojito/react-pack";
 import ChartContainer, { ChartProps } from "../common/ChartContainer";
+import cover from "./BarChart.png"
 
 type BarChartData = {
 	name: string;
@@ -21,7 +22,7 @@ function BarChart({
 }: BarChartProps) {
 	const opts = useMemo(() => {
 		const opt = {
-			backgroundColor:"transparent",
+			backgroundColor: "transparent",
 			tooltip: {
 				trigger: "axis",
 				axisPointer: {
@@ -57,7 +58,7 @@ function BarChart({
 				},
 			],
 		};
-		if(option){
+		if (option) {
 			return merge(opt, option);
 		}
 		return opt;
@@ -66,56 +67,60 @@ function BarChart({
 	return <ChartContainer {...restProps} option={opts} />;
 }
 
+const infos:ComponentInfo = {
+	name: "基础柱状图",
+	category: "柱状图", 
+	cover,
+	props: {
+		data: {
+			name: "数据",
+			description: '图表数据[{name:"类型", value:100}, ...]',
+			type: "array",
+			default: [
+				{
+					name: "Mon",
+					value: 120,
+				},
+				{
+					name: "Tue",
+					value: 200,
+				},
+				{
+					name: "Wed",
+					value: 150,
+				},
+				{
+					name: "Thu",
+					value: 80,
+				},
+				{
+					name: "Fri",
+					value: 70,
+				},
+				{
+					name: "Sat",
+					value: 110,
+				},
+				{
+					name: "Sun",
+					value: 130,
+				},
+			],
+		},
+		itemColors: {
+			name: "柱体颜色",
+			type: "array",
+			default: ["#2378f7", "#83bff6"],
+		},
+		options: {
+			name: "配置",
+			type: "object",
+			description: "Echarts配置，具体参考echarts官网"
+		},
+	},
+}
+
 export default CreatePack(
 	BarChart,
-	{
-		name: "基础柱状图",
-		props: {
-			data:{
-				name: "数据",
-				description: '图表数据[{name:"类型", value:100}, ...]',
-				type: "array",
-				default: [
-					{
-						name: "Mon",
-						value: 120,
-					},
-					{
-						name: "Tue",
-						value: 200,
-					},
-					{
-						name: "Wed",
-						value: 150,
-					},
-					{
-						name: "Thu",
-						value: 80,
-					},
-					{
-						name: "Fri",
-						value: 70,
-					},
-					{
-						name: "Sat",
-						value: 110,
-					},
-					{
-						name: "Sun",
-						value: 130,
-					},
-				],
-			},
-			itemColors:{
-				name: "柱体颜色",
-				type: "array",
-				default: ["#2378f7", "#83bff6"],
-			},
-      options:{
-				name: "配置",
-				type: "object",
-        description:"Echarts配置，具体参考echarts官网"
-			},
-		},
-	}
+	infos
 )

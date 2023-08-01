@@ -1,10 +1,5 @@
+import "systemjs";
 import { MojitoCompilerConfig } from "./conf";
-/**
- * 把真实文件系统转换到memfs系统
- * @param vol
- * @param rootPaths
- * @param parent
- */
 /**
  * 发布生产包
  * @param config

@@ -1,10 +1,13 @@
-import webpack from "webpack";
+import webpack, { Compilation } from "webpack";
 import WebpackDevServer from "webpack-dev-server";
 import webpackConfig from "./webpackConfig";
 import path from "path";
 import fs from "fs";
+import { JSDOM } from "jsdom"
+import "systemjs"
 import { createEntry, parseExternals } from "./parser";
 import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
+import { createOutFs, createServer, getComponentInfo } from "./server";
 
 const pkg = require(`${process.cwd()}/package.json`);
 pkg.name = pkg.name.replace(/[\\\/]/g, "-");
@@ -38,45 +41,13 @@ function createCompiler(config: MojitoCompilerConfig, isDev?: boolean) {
 	const exportComponents = createEntry(config, { basePack });
 	config = webpackConfig(config, pkg, { isDev, basePack });
 	config.entry = EntryFile;
+
 	delete config.template;
 	const compiler = webpack(config);
+	compiler.outputFileSystem = createOutFs()
 
 	return { compiler, conf: config, exportComponents, externalInfo };
 }
-
-/**
- * 把真实文件系统转换到memfs系统
- * @param vol
- * @param rootPaths
- * @param parent
- */
-// function pathTree(vol: Volume, rootPaths: string[], parent?: string) {
-// 	rootPaths.forEach((rootPath) => {
-// 		const absPath = parent ? path.resolve(parent, rootPath) : rootPath;
-// 		const stat = fs.lstatSync(absPath);
-// 		if (!parent || stat.isDirectory()) {
-// 			// 创建memfs目录
-// 			const paths = fs.readdirSync(absPath);
-// 			if (!vol.existsSync(absPath)) {
-// 				vol.mkdirSync(absPath, { recursive: true });
-// 			}
-// 			pathTree(vol, paths, absPath);
-// 		} else if (stat.isFile()) {
-// 			// 创建memfs文件
-// 			const filePath = path.dirname(absPath);
-// 			if (!vol.existsSync(filePath)) {
-// 				vol.mkdirSync(filePath, { recursive: true });
-// 			}
-// 			vol.writeFileSync(absPath, fs.readFileSync(absPath).toString());
-// 		} else if (stat.isSymbolicLink()) {
-// 			// 创建memfs快捷方式
-// 			const linkPath = fs.readlinkSync(absPath);
-// 			const paths = fs.readdirSync(linkPath);
-// 			pathTree(vol, paths, linkPath);
-// 			vol.symlinkSync(linkPath, absPath);
-// 		}
-// 	});
-// }
 
 /**
  * 发布生产包
@@ -87,7 +58,7 @@ export function production(config: MojitoCompilerConfig) {
 	const { compiler, conf, exportComponents, externalInfo } =
 		createCompiler(config);
 
-	compiler.run((err, stats) => {
+	compiler.run(async (err, stats) => {
 		if (err || stats?.hasErrors()) {
 			console.error(
 				"\x1b[43m%s\x1b[0m",
@@ -96,6 +67,61 @@ export function production(config: MojitoCompilerConfig) {
 			);
 			process.exit(1);
 		}
+
+		createServer(config.output!.path!, config.output!.publicPath as string, ()=>{
+			getComponentInfo(pkg.name, pkg.version, externalInfo?.cdn)
+		});
+		
+
+		// const file = fs.readFileSync(`${conf!.output!.path}/${pkg.name}.js`).toString();
+		// fs.writeFileSync(`${conf!.output!.path}/${pkg.name}.js`, `
+		// var self = {}
+		// var jsdom = require("jsdom");
+		// var { JSDOM } = jsdom;
+		// const { document } = new JSDOM("<!DOCTYPE html><p>Hello world</p>").window;
+		// ${file}`)
+
+			
+
+	// 	let importMaps = {...externalInfo?.cdn}
+	// 	const run = `
+	// 	<html>
+	// 	<head>
+	// 		<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
+	// 		<script>
+	// 			System.addImportMap({
+	// 				imports: ${JSON.stringify(importMaps)},
+	// 			});
+	// 			window.mojito = {}
+	// 			async function load(){
+	// 				const components = await System.import("http://127.0.0.1:3838/public/mojito-echarts@1.0.1/mojito-echarts.js");
+	// 				for (const key in components) {
+	// 					if (key !== "__esModule" && typeof components[key]) {
+	// 						const comp = await components[key]();
+	// 						console.log("============================", comp);
+	// 						window.mojito[key] = new comp
+	// 					}
+	// 				}
+	// 			}
+	// 			load()
+	// 		</script>
+	// 	</head>
+	// 	<body>
+	// 	<script>document.body.appendChild(document.createElement("hr"));</script>
+	// 	</body>
+	// 	</html>
+	// `
+	// 	console.log(run)
+
+		// const { window } = new JSDOM(run, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:3838` });
+		// setTimeout(()=>{
+		// 	console.log(window.mojito)
+		// 	for(const key in window.mojito){
+		// 		console.log(window.mojito[key].__info)
+		// 	}
+		// }, 5000)
+
+
 
 		compiler.close((closeErr) => {
 			if (!closeErr) {
@@ -112,7 +138,7 @@ export function production(config: MojitoCompilerConfig) {
 						components: exportComponents,
 					})
 				);
-				
+
 				console.log('\x1b[32m%s\x1b[0m', "Build complete")
 			} else {
 				console.error(closeErr);

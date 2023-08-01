@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { useImperativeHandle, useLayoutEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
 
@@ -12,15 +12,15 @@ export interface MojitoComponentProps {
 
 export type ComponentPropsExplain = {
   name: string;
-  type: "string" | "number" | "boolean" | "object" | "array";
+  type: "string" | "number" | "boolean" | "object" | "array" | Array<string | number>;
   description?: string;
   default?: any;
 };
 
 export type ComponentInfo = {
   name: string;
+	category?:string;
   cover?: string;
-  version?: string;
   props?: Record<string, ComponentPropsExplain>;
   events?: Record<
     string,
@@ -32,7 +32,7 @@ export type ComponentInfo = {
 };
 
 export interface MojitoComponent<T> {
-  framework?: {
+  framework: {
     name: string;
     version: string;
   };
@@ -64,7 +64,7 @@ const App: React.FC<{
 		[currProps]
 	);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (onMount) {
 			onMount(props);
 		}
@@ -82,7 +82,6 @@ export function CreatePack<T extends object>(
 		__component: T = component;
 		__info = componentInfo;
 		__root: null | ReactDOM.Root = null;
-		// __eventer: null | EventTarget = null;
 		__props?: Record<string, any> = undefined;
 		__id = componentId;
 		__ref: AppActionRef = {current:undefined}
@@ -131,8 +130,7 @@ export function CreatePack<T extends object>(
 
 		setProps(newProps: Record<string, any>) {
 			if (this.__ref.current) {
-				const oldProps = this.__props;
-				this.__props = { ...oldProps, ...newProps };
+				this.__props = { ...this.__props, ...newProps };
 				this.__ref.current.updateProps(this.__props)
 			}
 		}

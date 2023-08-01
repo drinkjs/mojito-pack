@@ -1,5 +1,5 @@
 import { jsx as _jsx } from "react/jsx-runtime";
-import React, { useEffect, useImperativeHandle, useState } from "react";
+import React, { useImperativeHandle, useLayoutEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { nanoid } from "nanoid";
 const App = ({ component: Comp, props, appRef, onMount }) => {
@@ -9,7 +9,7 @@ const App = ({ component: Comp, props, appRef, onMount }) => {
             setCurrProps(props);
         }
     }), [currProps]);
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (onMount) {
             onMount(props);
         }
@@ -23,7 +23,6 @@ export function CreatePack(component, componentInfo) {
             this.__component = component;
             this.__info = componentInfo;
             this.__root = null;
-            // __eventer: null | EventTarget = null;
             this.__props = undefined;
             this.__id = componentId;
             this.__ref = { current: undefined };
@@ -56,8 +55,7 @@ export function CreatePack(component, componentInfo) {
         }
         setProps(newProps) {
             if (this.__ref.current) {
-                const oldProps = this.__props;
-                this.__props = Object.assign(Object.assign({}, oldProps), newProps);
+                this.__props = Object.assign(Object.assign({}, this.__props), newProps);
                 this.__ref.current.updateProps(this.__props);
             }
         }

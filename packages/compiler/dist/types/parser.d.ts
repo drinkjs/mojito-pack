@@ -3,6 +3,8 @@ import { BasePack, MojitoCompilerConfig } from "./conf";
 type ExportComponent = {
     export: string;
     name: string;
+    category?: string;
+    cover?: string;
 };
 export declare function getPathFiles(entry: string, extname?: string): {
     filename: string;

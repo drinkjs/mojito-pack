@@ -6,18 +6,18 @@ type AppActionRef = React.MutableRefObject<{
 export interface MojitoComponentProps {
     __display: "editor" | "viewer";
     __style?: Record<string, any>;
-    __updateProps?: (props: Record<string, any>) => void;
+    __UpdateProps?: (props: Record<string, any>) => void;
 }
 export type ComponentPropsExplain = {
     name: string;
-    type: "string" | "number" | "boolean" | "object" | "array";
+    type: "string" | "number" | "boolean" | "object" | "array" | Array<string | number>;
     description?: string;
     default?: any;
 };
 export type ComponentInfo = {
     name: string;
-    cover?: string;
-    version?: string;
+    category?: string;
+    cover?: any;
     props?: Record<string, ComponentPropsExplain>;
     events?: Record<string, {
         name?: string;
@@ -25,7 +25,7 @@ export type ComponentInfo = {
     }>;
 };
 export interface MojitoComponent<T> {
-    framework?: {
+    framework: {
         name: string;
         version: string;
     };

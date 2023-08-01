@@ -14,7 +14,7 @@ import {
 } from "ts-morph";
 import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
 
-type ExportComponent = {export:string, name:string}
+type ExportComponent = {export:string, name:string, category?:string, cover?:string}
 
 const TempDir = "node_modules/@mojito/__pack"
 
@@ -160,25 +160,30 @@ export function parseTs(tsEntry: string, enptyPath:string) {
 				// 组件名称
 				const component = (arg1 as Identifier).getText();
 				// 组件props
-				const props = arg2 as ObjectLiteralExpression;
+				// const props = arg2 as ObjectLiteralExpression;
 				// 保存组件信息
 				const componentInfo: Record<string, string> = { component };
 				// 第二个参数是对象，获取对象里的字段和值
-				const variables =
-					props.getProperties() as unknown as VariableDeclaration[];
-				variables.forEach((val) => {
-					componentInfo[val.getName()] = val.getInitializerOrThrow().getText();
-				});
-				if (componentInfo.props) {
-					componentInfo.props = componentInfo.props
-						.replace(/\s/g, "")
-						.replace("'", '"');
-				}
-				if (componentInfo.name) {
-					// 名称不能为空
-					componentInfo.name = componentInfo.name.replace(/['"]/g, "");
-					return componentInfo;
-				}
+				// const variables =
+				// 	props.getProperties() as unknown as VariableDeclaration[];
+				// variables.forEach((val) => {
+				// 	const value = val.getInitializer()?.getText();
+				// 	if(value){
+				// 		componentInfo[val.getName()] = value;
+				// 	}
+				// });
+				// if (componentInfo.props) {
+				// 	componentInfo.props = componentInfo.props
+				// 		.replace(/\s/g, "")
+				// 		.replace("'", '"');
+				// }
+				// if (componentInfo.name) {
+				// 	// 名称不能为空
+				// 	componentInfo.name = componentInfo.name.replace(/['"]/g, "");
+				// 	return componentInfo;
+				// }
+				componentInfo.name = component.toString()
+				return componentInfo;
 			}
 		}
 	};
@@ -249,7 +254,8 @@ export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
 					variable = exportName;
 				}
 
-				exportComponents.push({export: variable, name: componentInfo[exportName].name})
+				const {name, category, cover} = componentInfo[exportName];
+				exportComponents.push({export: variable, name, category, cover});
 
 				// 生成 export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
 				const exportText = `export const ${variable} = async ()=> (await import("./${importFile}")).${exportName};`;
