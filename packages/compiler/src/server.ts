@@ -91,7 +91,8 @@ export function outputBuild(outPath: string) {
   const files = vol.readdirSync(outPath);
   console.log(`\x1b[32m${path.normalize(outPath)}`);
   files.forEach(file => {
-    vol.createReadStream(`${outPath}/${file}`).pipe(fs.createWriteStream(`${outPath}/${file}`));
+    const content = vol.readFileSync(`${outPath}/${file}`);
+    fs.writeFileSync(`${outPath}/${file}`, content);
     console.log("\t"+file)
   })
   console.log("\x1b[0m")

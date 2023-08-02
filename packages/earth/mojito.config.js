@@ -1,5 +1,8 @@
 module.exports = {
   entry: "./src/*.tsx",
+  output:{
+    publicPath:"/public",
+  },
   externals: {
     // three: ['https://unpkg.com/three@0.154.0/build/three.min.js', 'THREE'],
     // "OrbitControls": ['https://cdn.jsdelivr.net/npm/three-orbitcontrols@2.110.3/OrbitControls.min.js'],
