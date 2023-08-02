@@ -1,6 +1,6 @@
 import {Configuration} from "webpack";
 
-export const EntryFile = "./mojito_entry.ts"
+export const EntryFile = "./mojito.entry.ts"
 
 export enum BasePack {
   vue="vue",

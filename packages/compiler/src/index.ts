@@ -3,11 +3,10 @@ import WebpackDevServer from "webpack-dev-server";
 import webpackConfig from "./webpackConfig";
 import path from "path";
 import fs from "fs";
-import { JSDOM } from "jsdom"
 import "systemjs"
-import { createEntry, parseExternals } from "./parser";
+import { createEntry, ExportComponent, parseExternals } from "./parser";
 import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
-import { createOutFs, createServer, getComponentInfo } from "./server";
+import { createOutFs, createServer, getComponentInfo, outputBuild } from "./server";
 
 const pkg = require(`${process.cwd()}/package.json`);
 pkg.name = pkg.name.replace(/[\\\/]/g, "-");
@@ -68,81 +67,46 @@ export function production(config: MojitoCompilerConfig) {
 			process.exit(1);
 		}
 
-		createServer(config.output!.path!, config.output!.publicPath as string, ()=>{
-			getComponentInfo(pkg.name, pkg.version, externalInfo?.cdn)
-		});
-		
-
-		// const file = fs.readFileSync(`${conf!.output!.path}/${pkg.name}.js`).toString();
-		// fs.writeFileSync(`${conf!.output!.path}/${pkg.name}.js`, `
-		// var self = {}
-		// var jsdom = require("jsdom");
-		// var { JSDOM } = jsdom;
-		// const { document } = new JSDOM("<!DOCTYPE html><p>Hello world</p>").window;
-		// ${file}`)
-
-			
-
-	// 	let importMaps = {...externalInfo?.cdn}
-	// 	const run = `
-	// 	<html>
-	// 	<head>
-	// 		<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
-	// 		<script>
-	// 			System.addImportMap({
-	// 				imports: ${JSON.stringify(importMaps)},
-	// 			});
-	// 			window.mojito = {}
-	// 			async function load(){
-	// 				const components = await System.import("http://127.0.0.1:3838/public/mojito-echarts@1.0.1/mojito-echarts.js");
-	// 				for (const key in components) {
-	// 					if (key !== "__esModule" && typeof components[key]) {
-	// 						const comp = await components[key]();
-	// 						console.log("============================", comp);
-	// 						window.mojito[key] = new comp
-	// 					}
-	// 				}
-	// 			}
-	// 			load()
-	// 		</script>
-	// 	</head>
-	// 	<body>
-	// 	<script>document.body.appendChild(document.createElement("hr"));</script>
-	// 	</body>
-	// 	</html>
-	// `
-	// 	console.log(run)
-
-		// const { window } = new JSDOM(run, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:3838` });
-		// setTimeout(()=>{
-		// 	console.log(window.mojito)
-		// 	for(const key in window.mojito){
-		// 		console.log(window.mojito[key].__info)
-		// 	}
-		// }, 5000)
-
-
-
 		compiler.close((closeErr) => {
 			if (!closeErr) {
-				if (exportComponents.length === 0) {
-					throw new Error("No Export Components");
-				}
-
-				fs.writeFileSync(
-					`${conf!.output!.path}/mojito-pack.json`,
-					JSON.stringify({
-						name: pkg.name,
-						version: pkg.version,
-						external: externalInfo?.cdn,
-						components: exportComponents,
-					})
-				);
-
-				console.log('\x1b[32m%s\x1b[0m', "Build complete")
+				console.log("Build complete")
 			} else {
 				console.error(closeErr);
+				process.exit(1)
 			}
+		});
+
+		createServer(config.output!.path!, config.output!.publicPath as string, async ()=>{
+			const components = await getComponentInfo(pkg.name, pkg.version, externalInfo?.cdn) as Array<any>;
+			if (components.length === 0) {
+				throw new Error("No components are available");
+			}
+			const infos:ExportComponent[] = []
+			for(const key in components){
+        if(components[key].__info){
+					const {name, category, cover} = components[key].__info;
+          console.log(`\x1b[34m\u{1F680}\u{1F680}\u{1F680} ${components[key].__info.name}`);
+					infos.push({
+						exportName: key,
+						name,
+						category,
+						cover
+					})
+        }
+      }
+
+			outputBuild(config.output!.path!)
+
+			fs.writeFileSync(
+				`${conf!.output!.path}/mojito-pack.json`,
+				JSON.stringify({
+					name: pkg.name,
+					version: pkg.version,
+					external: externalInfo?.cdn,
+					components: infos,
+				})
+			);
+			process.exit(0)
 		});
 	});
 }

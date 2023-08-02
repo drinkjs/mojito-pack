@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { BasePack, MojitoCompilerConfig } from "./conf";
-type ExportComponent = {
-    export: string;
+export type ExportComponent = {
+    exportName: string;
     name: string;
     category?: string;
     cover?: string;
@@ -34,4 +34,3 @@ export declare function parseExternals(configExternals: any): {
     externals: Record<string, string>;
     cdn: Record<string, string>;
 };
-export {};

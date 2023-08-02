@@ -103,9 +103,6 @@ export default (
 				{
 					test: /.[jt]sx?$/,
 					use: [
-						// {
-						// 	loader: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js"
-						// },
 						{
 							loader: loaderPath("esbuild-loader"),
 							options: {
@@ -118,7 +115,6 @@ export default (
 					// exclude: /node_modules/,
 				},
 				{
-					use: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js",
 					test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
 					type: 'asset/resource'
 				},

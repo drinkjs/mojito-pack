@@ -51,7 +51,7 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 
-const EntryFile = "./mojito_entry.ts";
+const EntryFile = "./mojito.entry.ts";
 var BasePack;
 (function (BasePack) {
     BasePack["vue"] = "vue";
@@ -143,9 +143,6 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                 {
                     test: /.[jt]sx?$/,
                     use: [
-                        // {
-                        // 	loader: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js"
-                        // },
                         {
                             loader: loaderPath("esbuild-loader"),
                             options: {
@@ -158,7 +155,6 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     // exclude: /node_modules/,
                 },
                 {
-                    use: "E:/project/drinkjs/mojito-compack/packages/compiler/src/cover-loader.js",
                     test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
                     type: 'asset/resource'
                 },
@@ -324,10 +320,10 @@ function parseTs(tsEntry, enptyPath) {
             if (arg1 && arg2) {
                 // 组件名称
                 const component = arg1.getText();
-                // 组件props
-                // const props = arg2 as ObjectLiteralExpression;
                 // 保存组件信息
                 const componentInfo = { component };
+                // 组件props
+                // const props = arg2 as ObjectLiteralExpression;
                 // 第二个参数是对象，获取对象里的字段和值
                 // const variables =
                 // 	props.getProperties() as unknown as VariableDeclaration[];
@@ -412,7 +408,7 @@ function createEntry({ entry }, opts) {
                     variable = exportName;
                 }
                 const { name, category, cover } = componentInfo[exportName];
-                exportComponents.push({ export: variable, name, category, cover });
+                exportComponents.push({ exportName: variable, name, category, cover });
                 // 生成 export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
                 const exportText = `export const ${variable} = async ()=> (await import("./${importFile}")).${exportName};`;
                 if (!isHot) {
@@ -457,22 +453,23 @@ function parseExternals(configExternals) {
 }
 
 const vol = new Volume();
+let port = 4567;
 function createOutFs() {
     return vol;
 }
-let port = 3838;
 function createServer(outPath, publicPath, cb) {
     const server = http.createServer((req, res) => {
         if (req.url) {
             try {
                 const filePath = req.url.replace(publicPath.substring(0, publicPath.length - 1), "");
-                const text = vol.readFileSync(`${outPath}${filePath}`).toString();
+                const text = vol.readFileSync(`${outPath}${filePath}`);
                 res.writeHead(200, { 'Content-Type': 'application/javascript' });
                 res.write(text);
                 res.end();
             }
             catch (e) {
-                console.log(e);
+                console.error(e);
+                process.exit(1);
             }
         }
     });
@@ -485,18 +482,19 @@ function createServer(outPath, publicPath, cb) {
         server.listen(_port);
     })
         .catch(err => {
-        console.log(err);
+        console.error(err);
         process.exit(1);
     });
 }
 function getComponentInfo(pkgName, pkgVersion, cdn) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("Get component info...");
+        console.log("Checking components...");
+        const systemPath = path.resolve(__dirname, "../node_modules/systemjs/dist/system.min.js");
         const importMaps = Object.assign(Object.assign({}, cdn), { [pkgName]: `http://127.0.0.1:${port}/${pkgName}.js` });
         const html = `
 		<html>
 		<head>
-			<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
+			<script src="file://${systemPath}"></script>
 			<script>
 				System.addImportMap({
 					imports: ${JSON.stringify(importMaps)},
@@ -505,7 +503,7 @@ function getComponentInfo(pkgName, pkgVersion, cdn) {
 				async function load(){
 					const components = await System.import("${pkgName}");
 					for (const key in components) {
-						if (key !== "__esModule" && typeof components[key]) {
+						if (typeof components[key] === "function") {
 							const comp = await components[key]();
 							components[key] = new comp
 						}
@@ -522,11 +520,23 @@ function getComponentInfo(pkgName, pkgVersion, cdn) {
         const { window } = new JSDOM(html, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:${port}` });
         return new Promise((resolve) => {
             window.onComponents = (components) => {
-                console.log(components);
                 resolve(components);
             };
         });
     });
+}
+function outputBuild(outPath) {
+    if (fs.existsSync(outPath)) {
+        fs.rmSync(outPath, { recursive: true });
+    }
+    fs.mkdirSync(outPath, { recursive: true });
+    const files = vol.readdirSync(outPath);
+    console.log(`\x1b[32m${path.normalize(outPath)}`);
+    files.forEach(file => {
+        vol.createReadStream(`${outPath}/${file}`).pipe(fs.createWriteStream(`${outPath}/${file}`));
+        console.log("\t" + file);
+    });
+    console.log("\x1b[0m");
 }
 
 const pkg = require(`${process.cwd()}/package.json`);
@@ -575,69 +585,42 @@ function production(config) {
             console.error("\x1b[43m%s\x1b[0m", "Error:", (err === null || err === void 0 ? void 0 : err.message) || (stats === null || stats === void 0 ? void 0 : stats.compilation.errors));
             process.exit(1);
         }
-        createServer(config.output.path, config.output.publicPath, () => {
-            getComponentInfo(pkg.name, pkg.version, externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn);
-        });
-        // const file = fs.readFileSync(`${conf!.output!.path}/${pkg.name}.js`).toString();
-        // fs.writeFileSync(`${conf!.output!.path}/${pkg.name}.js`, `
-        // var self = {}
-        // var jsdom = require("jsdom");
-        // var { JSDOM } = jsdom;
-        // const { document } = new JSDOM("<!DOCTYPE html><p>Hello world</p>").window;
-        // ${file}`)
-        // 	let importMaps = {...externalInfo?.cdn}
-        // 	const run = `
-        // 	<html>
-        // 	<head>
-        // 		<script src="file://E:/project/drinkjs/mojito-compack/packages/compiler/node_modules/systemjs/dist/system.min.js"></script>
-        // 		<script>
-        // 			System.addImportMap({
-        // 				imports: ${JSON.stringify(importMaps)},
-        // 			});
-        // 			window.mojito = {}
-        // 			async function load(){
-        // 				const components = await System.import("http://127.0.0.1:3838/public/mojito-echarts@1.0.1/mojito-echarts.js");
-        // 				for (const key in components) {
-        // 					if (key !== "__esModule" && typeof components[key]) {
-        // 						const comp = await components[key]();
-        // 						console.log("============================", comp);
-        // 						window.mojito[key] = new comp
-        // 					}
-        // 				}
-        // 			}
-        // 			load()
-        // 		</script>
-        // 	</head>
-        // 	<body>
-        // 	<script>document.body.appendChild(document.createElement("hr"));</script>
-        // 	</body>
-        // 	</html>
-        // `
-        // 	console.log(run)
-        // const { window } = new JSDOM(run, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:3838` });
-        // setTimeout(()=>{
-        // 	console.log(window.mojito)
-        // 	for(const key in window.mojito){
-        // 		console.log(window.mojito[key].__info)
-        // 	}
-        // }, 5000)
         compiler.close((closeErr) => {
             if (!closeErr) {
-                if (exportComponents.length === 0) {
-                    throw new Error("No Export Components");
-                }
-                fs.writeFileSync(`${conf.output.path}/mojito-pack.json`, JSON.stringify({
-                    name: pkg.name,
-                    version: pkg.version,
-                    external: externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn,
-                    components: exportComponents,
-                }));
-                console.log('\x1b[32m%s\x1b[0m', "Build complete");
+                console.log("Build complete");
             }
             else {
                 console.error(closeErr);
+                process.exit(1);
             }
         });
+        createServer(config.output.path, config.output.publicPath, () => __awaiter(this, void 0, void 0, function* () {
+            const components = yield getComponentInfo(pkg.name, pkg.version, externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn);
+            if (components.length === 0) {
+                throw new Error("No components are available");
+            }
+            const infos = [];
+            for (const key in components) {
+                if (components[key].__info) {
+                    const { name, category, cover } = components[key].__info;
+                    console.log(`\x1b[34m\u{1F680}\u{1F680}\u{1F680} ${components[key].__info.name}`);
+                    infos.push({
+                        exportName: key,
+                        name,
+                        category,
+                        cover
+                    });
+                }
+            }
+            outputBuild(config.output.path);
+            fs.writeFileSync(`${conf.output.path}/mojito-pack.json`, JSON.stringify({
+                name: pkg.name,
+                version: pkg.version,
+                external: externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn,
+                components: infos,
+            }));
+            process.exit(0);
+        }));
     }));
 }
 /**

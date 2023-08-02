@@ -1,5 +1,8 @@
 module.exports = {
   entry: "./src/components/*.tsx",
+  output:{
+    publicPath:"/public",
+  },
   externals: {
     // react: ['https://unpkg.com/react@18/umd/react.production.min.js', 'react'],
     // "react-dom": ['https://unpkg.com/react-dom@18/umd/react-dom.production.min.js', 'react-dom'],

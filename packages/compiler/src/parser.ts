@@ -14,7 +14,7 @@ import {
 } from "ts-morph";
 import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
 
-type ExportComponent = {export:string, name:string, category?:string, cover?:string}
+export type ExportComponent = { exportName: string, name: string, category?: string, cover?: string }
 
 const TempDir = "node_modules/@mojito/__pack"
 
@@ -61,9 +61,9 @@ export function parseVue(filepath: string) {
 			sourceMap: false,
 		});
 
-    if(errors && errors.length){
-      throw errors;
-  }
+		if (errors && errors.length) {
+			throw errors;
+		}
 
 		if (descriptor.script) {
 			const relativePath = path.relative(filepath, v.filename);
@@ -79,7 +79,7 @@ export function parseVue(filepath: string) {
 	return parseTs(`${buildpath}/**/*.ts`, filepath);
 }
 
-export function parseTs(tsEntry: string, enptyPath:string) {
+export function parseTs(tsEntry: string, enptyPath: string) {
 	const parseAST = (entryFile: string | string[]) => {
 		// 解析入口文件AST
 		const project = new Project({
@@ -159,10 +159,10 @@ export function parseTs(tsEntry: string, enptyPath:string) {
 			if (arg1 && arg2) {
 				// 组件名称
 				const component = (arg1 as Identifier).getText();
-				// 组件props
-				// const props = arg2 as ObjectLiteralExpression;
 				// 保存组件信息
 				const componentInfo: Record<string, string> = { component };
+				// 组件props
+				// const props = arg2 as ObjectLiteralExpression;
 				// 第二个参数是对象，获取对象里的字段和值
 				// const variables =
 				// 	props.getProperties() as unknown as VariableDeclaration[];
@@ -191,14 +191,14 @@ export function parseTs(tsEntry: string, enptyPath:string) {
 	return parseAST(tsEntry);
 }
 
-export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
-  if(basePack === BasePack.vue){
-    return parseVue(filepath);
-  }else if(basePack === BasePack.react){
-    return parseTs(entry, filepath)
-  }else{
-    throw new Error(`Cannot be identified ${entry}`)
-  }
+export function parseEntry(entry: string, filepath: string, basePack?: BasePack) {
+	if (basePack === BasePack.vue) {
+		return parseVue(filepath);
+	} else if (basePack === BasePack.react) {
+		return parseTs(entry, filepath)
+	} else {
+		throw new Error(`Cannot be identified ${entry}`)
+	}
 }
 
 
@@ -208,31 +208,31 @@ export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
  * @param entryPath 入口文件路径
  * @param isHot 是否为热更新
  */
- export function createEntry({entry}: MojitoCompilerConfig, opts:{basePack?:BasePack, isHot?:boolean}) {
+export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: BasePack, isHot?: boolean }) {
 
-	const {basePack, isHot} = opts;
+	const { basePack, isHot } = opts;
 
-  const parsePath = entry.substring(0, entry.indexOf("*"));
+	const parsePath = entry.substring(0, entry.indexOf("*"));
 	const entpryPath = path.resolve(process.cwd(), parsePath);
 
 	const allComponents = parseEntry(entry, entpryPath, basePack);
-	if(!allComponents || allComponents.length === 0) return [];
+	if (!allComponents || allComponents.length === 0) return [];
 
-	let exportArr:any[] = [];	
-	const filterImports:string[] = [];
+	let exportArr: any[] = [];
+	const filterImports: string[] = [];
 
-	const exportComponents:ExportComponent[] = [];
+	const exportComponents: ExportComponent[] = [];
 
 	allComponents.forEach((component) => {
 		for (let filePath in component) {
-      const componentInfo = component[filePath];
+			const componentInfo = component[filePath];
 
-      let importFile = ""
-			if(filePath.includes(TempDir)){
-					filePath = filePath.substring(filePath.indexOf(TempDir) + TempDir.length);
-					importFile = path.relative(process.cwd(), `${entpryPath}/${filePath}`);
-			}else{
-					importFile = path.relative(process.cwd(), filePath);
+			let importFile = ""
+			if (filePath.includes(TempDir)) {
+				filePath = filePath.substring(filePath.indexOf(TempDir) + TempDir.length);
+				importFile = path.relative(process.cwd(), `${entpryPath}/${filePath}`);
+			} else {
+				importFile = path.relative(process.cwd(), filePath);
 			}
 
 			importFile = importFile
@@ -244,26 +244,26 @@ export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
 					// 使用文件名作为导出
 					const sp = importFile.split("/");
 					const lastName = sp[sp.length - 1]
-					let defaultName = lastName.includes(".") ? lastName.substring(0,lastName.indexOf(".")) : lastName;
+					let defaultName = lastName.includes(".") ? lastName.substring(0, lastName.indexOf(".")) : lastName;
 					if (defaultName === "index") {
-							// 使用最后一层目录
-							defaultName = sp[sp.length - 2] || "Component";
+						// 使用最后一层目录
+						defaultName = sp[sp.length - 2] || "Component";
 					}
 					variable = defaultName;
 				} else {
 					variable = exportName;
 				}
 
-				const {name, category, cover} = componentInfo[exportName];
-				exportComponents.push({export: variable, name, category, cover});
+				const { name, category, cover } = componentInfo[exportName];
+				exportComponents.push({ exportName: variable, name, category, cover });
 
 				// 生成 export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
 				const exportText = `export const ${variable} = async ()=> (await import("./${importFile}")).${exportName};`;
 				if (!isHot) {
 					exportArr.push(exportText);
-				}else{
+				} else {
 					// watch模式下重新编译修过的文件
-					if(!filterImports.includes(importFile)){
+					if (!filterImports.includes(importFile)) {
 						exportArr = exportArr.filter(text => !text.includes(importFile));
 						filterImports.push(importFile)
 					}
@@ -283,7 +283,7 @@ export function parseEntry(entry:string, filepath:string, basePack?:BasePack){
  * @param configExternals
  * @returns
  */
- export function parseExternals(configExternals: any) {
+export function parseExternals(configExternals: any) {
 	const externals: Record<string, string> = {};
 	const cdn: Record<string, string> = {};
 	const confExternals: any = configExternals;

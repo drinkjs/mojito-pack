@@ -1,1 +1,1 @@
-{"name":"mojito-element","version":"1.0.0","external":{},"components":[{"export":"components","name":"Test"}]}
+{"name":"mojito-element","version":"1.0.0","external":{},"components":[{"exportName":"components","name":"vue测试"}]}

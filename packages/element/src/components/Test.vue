@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, getCurrentInstance } from "vue";
+import { ref } from "vue";
 import { MojitoComponentProps } from '@mojito/vue-pack';
 
 interface TestProps extends MojitoComponentProps{
@@ -9,13 +9,6 @@ interface TestProps extends MojitoComponentProps{
 	const count = ref(0);
 	const data = ref(props);
 
-	const instance = getCurrentInstance()
-
-	console.log("===", instance)
-
-	onMounted(()=>{
-		console.log(instance?.options)
-	})
 </script>
 
 <template>
