@@ -1,34 +1,34 @@
-import ChartContainer, { ChartProps } from "../common/ChartContainer";
 import { merge } from "lodash-es";
 import { useMemo } from "react";
 import { CreatePack } from "@mojito/react-pack";
+import ChartContainer, { ChartProps } from "../../common/ChartContainer";
+import cover from "./bar-simple.webp"
 
-type LineChartData = {
+type BarChartData = {
 	name: string;
 	value: number;
 };
 
-interface LinehartProps extends ChartProps<LineChartData[]> {
-	smooth?: boolean;
-  itemColor?: string;
+interface BarChartProps extends ChartProps<BarChartData[]> {
+
 }
 
-function LineChart({
+function BarChart({
 	data = [],
-	smooth,
-	itemColor,
 	option,
 	...restProps
-}: LinehartProps) {
+}: BarChartProps) {
 	const opts = useMemo(() => {
 		const opt = {
-			backgroundColor:"transparent",
+			backgroundColor: "transparent",
 			tooltip: {
 				trigger: "axis",
+				axisPointer: {
+					type: "shadow",
+				},
 			},
 			xAxis: {
 				type: "category",
-				boundaryGap: false,
 				data: data.map((v) => v.name),
 			},
 			yAxis: {
@@ -46,30 +46,24 @@ function LineChart({
 			series: [
 				{
 					data: data.map((v) => v.value),
-					type: "line",
-					smooth,
-					itemStyle: {
-						color: itemColor || undefined,
-					},
+					type: "bar",
 				},
 			],
 		};
-		if(option){
-			return merge(opt, option);
-		}
-		return opt;
-	}, [data, smooth, itemColor, option]);
+		return merge(opt, option);
+	}, [data, option]);
 
 	return <ChartContainer {...restProps} option={opts} />;
 }
 
-
 export default CreatePack(
-	LineChart,
+	BarChart,
 	{
-		name: "基础折线图",
+		name: "基本柱状图",
+		category: "柱状图", 
+		cover,
 		props: {
-			data:{
+			data: {
 				name: "数据",
 				description: '图表数据[{name:"类型", value:100}, ...]',
 				type: "array",
@@ -104,19 +98,11 @@ export default CreatePack(
 					},
 				],
 			},
-			smooth:{
-				name: "平滑",
-				type:"boolean",
-			},
-			itemColor:{
-				name: "线段颜色",
-				type:"string",
-			},
-      options:{
+			options: {
 				name: "配置",
 				type: "object",
-        description:"Echarts配置，具体参考echarts官网"
+				description: "Echarts配置，具体参考echarts官网"
 			},
 		},
 	}
-);
+)

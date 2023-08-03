@@ -50,7 +50,6 @@ export default (
 		return [
 			{
 				loader: loaderPath("mojito-vue-style-loader"),
-				// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
 				options: {
 					pkg,
 				}
@@ -58,6 +57,13 @@ export default (
 			{
 				loader: loaderPath("css-loader"),
 				options: { importLoaders: 1, modules: isModule },
+			},
+			{
+				loader: loaderPath("esbuild-loader"),
+				options: {
+					loader: 'css',
+					minify: true,
+				},
 			},
 			{
 				loader: loaderPath("postcss-loader")
@@ -115,7 +121,7 @@ export default (
 					// exclude: /node_modules/,
 				},
 				{
-					test: /\.(png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
+					test: /\.(webp|png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
 					type: 'asset/resource'
 				},
 				{

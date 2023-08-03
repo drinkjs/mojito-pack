@@ -1,7 +1,8 @@
-import ChartContainer, { ChartProps } from "../common/ChartContainer";
+import ChartContainer, { ChartProps } from "../../common/ChartContainer";
 import { merge } from "lodash-es";
 import { useMemo } from "react";
 import { CreatePack } from "@mojito/react-pack";
+import cover from "./pie-simple.webp"
 
 type PieChartData = {
 	name: string;
@@ -34,7 +35,7 @@ function PieChart({
       series: [
         {
           type: "pie",
-          radius: "85%",
+          radius,
           center: ["50%", "50%"],
           selectedMode: "single",
           data,
@@ -48,10 +49,7 @@ function PieChart({
         },
       ],
     }
-		if(option){
-			return merge(opt, option);
-		}
-		return opt;
+		return merge(opt, option);
 	}, [data, option]);
 
 	return <ChartContainer {...restProps} option={opts} />;
@@ -62,7 +60,14 @@ export default CreatePack(
 	PieChart,
 	{
 		name: "基础饼图",
+    category:"饼图",
+    cover,
 		props: {
+      radius:{
+        name:"半径",
+        default:"80%",
+        type:"string"
+      },
 			data:{
 				name: "数据",
 				description: '图表数据[{name:"类型", value:100}, ...]',

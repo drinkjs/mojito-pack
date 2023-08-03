@@ -1,4 +1,13 @@
-export const BarChart = async ()=> (await import("./src/components/BarChart")).default;
-export const LineChart = async ()=> (await import("./src/components/LineChart")).default;
-export const PieChart = async ()=> (await import("./src/components/PieChart")).default;
-export const ScatterChart = async ()=> (await import("./src/components/ScatterChart")).default;
+export const BarChart = async ()=> (await import("./src/components/BarChart/BarChart")).default;
+export const BarChartY = async ()=> (await import("./src/components/BarChart/BarChartY")).default;
+export const MultipleBar = async ()=> (await import("./src/components/BarChart/MultipleBar")).default;
+export const MultipleBarY = async ()=> (await import("./src/components/BarChart/MultipleBarY")).default;
+export const StackBar = async ()=> (await import("./src/components/BarChart/StackBar")).default;
+export const StackBarY = async ()=> (await import("./src/components/BarChart/StackBarY")).default;
+export const AreaLine = async ()=> (await import("./src/components/LineChart/AreaLine")).default;
+export const LineChart = async ()=> (await import("./src/components/LineChart/LineChart")).default;
+export const StackLine = async ()=> (await import("./src/components/LineChart/StackLine")).default;
+export const Doughnut = async ()=> (await import("./src/components/PieChart/Doughnut")).default;
+export const PieChart = async ()=> (await import("./src/components/PieChart/PieChart")).default;
+export const Rose = async ()=> (await import("./src/components/PieChart/Rose")).default;
+export const ScatterChart = async ()=> (await import("./src/components/Scatter/ScatterChart")).default;
