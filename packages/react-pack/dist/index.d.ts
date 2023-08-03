@@ -10,14 +10,14 @@ export interface MojitoComponentProps {
 }
 export type ComponentPropsExplain = {
     name: string;
-    type: "string" | "number" | "boolean" | "object" | "array" | Array<string | number>;
+    type: "string" | "number" | "boolean" | "object" | "array" | "image" | Array<string | number>;
     description?: string;
     default?: any;
 };
 export type ComponentInfo = {
     name: string;
     category?: string;
-    cover?: any;
+    cover?: string;
     props?: Record<string, ComponentPropsExplain>;
     events?: Record<string, {
         name?: string;

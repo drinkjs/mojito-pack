@@ -385,6 +385,7 @@ function createEntry({ entry }, opts) {
     let exportArr = [];
     const filterImports = [];
     const exportComponents = [];
+    const exportNames = new Set();
     allComponents.forEach((component) => {
         for (let filePath in component) {
             const componentInfo = component[filePath];
@@ -408,12 +409,18 @@ function createEntry({ entry }, opts) {
                     let defaultName = lastName.includes(".") ? lastName.substring(0, lastName.indexOf(".")) : lastName;
                     if (defaultName === "index") {
                         // 使用最后一层目录
-                        defaultName = sp[sp.length - 2] || "Component";
+                        defaultName = sp[sp.length - 2] || "ComponentIndex";
                     }
                     variable = defaultName;
                 }
                 else {
                     variable = exportName;
+                }
+                if (exportNames.has(variable)) {
+                    variable += `${exportNames.size + 1}`;
+                }
+                else {
+                    exportNames.add(variable);
                 }
                 const { name, category, cover } = componentInfo[exportName];
                 exportComponents.push({ exportName: variable, name, category, cover });

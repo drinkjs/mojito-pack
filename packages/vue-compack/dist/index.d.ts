@@ -1,19 +1,24 @@
 import * as Vue from "vue";
-export interface MojitoComponentProps {
+export interface IMojitoComponentProps {
     __display: "editor" | "viewer";
     __style?: Record<string, any>;
     __updateProps?: (props: Record<string, any>) => void;
 }
+export declare const MojitoComponentProps: {
+    __display: StringConstructor;
+    __style: ObjectConstructor;
+    __updateProps: FunctionConstructor;
+};
 export type ComponentPropsExplain = {
     name: string;
-    type: "string" | "number" | "boolean" | "object" | "array";
+    type: "string" | "number" | "boolean" | "object" | "array" | "image" | Array<string | number>;
     description?: string;
     default?: any;
 };
 export type ComponentInfo = {
     name: string;
+    category?: string;
     cover?: string;
-    version?: string;
     props?: Record<string, ComponentPropsExplain>;
     events?: Record<string, {
         name?: string;

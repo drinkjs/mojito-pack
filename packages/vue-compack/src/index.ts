@@ -2,23 +2,29 @@ import * as Vue from "vue";
 import { defineComponent, h, Component, ref, onMounted } from "vue";
 import type { PropType } from "vue";
 import { nanoid } from "nanoid";
-export interface MojitoComponentProps {
+export interface IMojitoComponentProps {
   __display: "editor" | "viewer";
   __style?: Record<string, any>;
   __updateProps?: (props:Record<string, any>)=>void
 }
 
+export const MojitoComponentProps = {
+	__display: String,
+	__style: Object,
+	__updateProps: Function
+}
+
 export type ComponentPropsExplain = {
-  name: string;
-  type: "string" | "number" | "boolean" | "object" | "array";
-  description?: string;
-  default?: any;
+  name: string,
+  type: "string" | "number" | "boolean" | "object" | "array" | "image" | Array<string | number>,
+  description?: string,
+  default?: any,
 };
 
 export type ComponentInfo = {
   name: string;
+	category?:string,
   cover?: string;
-  version?: string;
   props?: Record<string, ComponentPropsExplain>;
   events?: Record<
     string,
@@ -103,7 +109,6 @@ export function CreatePack<T extends object>(
 			this.__props = { ...this.getDefaultProps(), ...props };
 			const self = this;
 			this.__root = createApp({
-				shadowRoot: container.parentNode,
 				setup() {
 					const componentRef = ref();
 					onMounted(() => {

@@ -1,6 +1,11 @@
 import * as Vue from "vue";
 import { defineComponent, h, ref, onMounted } from "vue";
 import { nanoid } from "nanoid";
+export const MojitoComponentProps = {
+    __display: String,
+    __style: Object,
+    __updateProps: Function
+};
 const App = defineComponent({
     props: {
         componentProps: {
@@ -48,7 +53,6 @@ export function CreatePack(component, componentInfo) {
             this.__props = Object.assign(Object.assign({}, this.getDefaultProps()), props);
             const self = this;
             this.__root = createApp({
-                shadowRoot: container.parentNode,
                 setup() {
                     const componentRef = ref();
                     onMounted(() => {

@@ -13,6 +13,7 @@
   "dependencies": {
     "@mojito/compiler": "workspace:^",
     "@mojito/vue-pack": "workspace:^",
+    "element-plus": "^2.3.8",
     "typescript": "^5.1.6",
     "vue": "^3.3.4",
     "vue-loader": "^17.2.2",

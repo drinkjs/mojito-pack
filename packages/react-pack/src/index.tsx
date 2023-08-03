@@ -12,7 +12,7 @@ export interface MojitoComponentProps {
 
 export type ComponentPropsExplain = {
   name: string;
-  type: "string" | "number" | "boolean" | "object" | "array" | Array<string | number>;
+  type: "string" | "number" | "boolean" | "object" | "array" | "image" | Array<string | number>;
   description?: string;
   default?: any;
 };

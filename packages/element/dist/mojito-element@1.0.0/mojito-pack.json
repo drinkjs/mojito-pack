@@ -1,1 +1,1 @@
-{"name":"mojito-element","version":"1.0.0","external":{},"components":[{"exportName":"components","name":"vue测试"}]}
+{"name":"mojito-element","version":"1.0.0","external":{},"components":[{"exportName":"PackButton","name":"按钮","category":"基础组件"},{"exportName":"PackImage","name":"图片","category":"基础组件"},{"exportName":"PackTabel","name":"表格","category":"数据展示"},{"exportName":"PackText","name":"文本","category":"基础组件"}]}

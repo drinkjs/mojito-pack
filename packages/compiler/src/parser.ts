@@ -222,7 +222,8 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 	const filterImports: string[] = [];
 
 	const exportComponents: ExportComponent[] = [];
-
+	const exportNames = new Set()	;
+	
 	allComponents.forEach((component) => {
 		for (let filePath in component) {
 			const componentInfo = component[filePath];
@@ -238,6 +239,7 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 			importFile = importFile
 				.substring(0, importFile.lastIndexOf("."))
 				.replace(/\\/g, "/");
+			
 			for (const exportName in componentInfo) {
 				let variable = "";
 				if (exportName === "default") {
@@ -247,11 +249,17 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 					let defaultName = lastName.includes(".") ? lastName.substring(0, lastName.indexOf(".")) : lastName;
 					if (defaultName === "index") {
 						// 使用最后一层目录
-						defaultName = sp[sp.length - 2] || "Component";
+						defaultName = sp[sp.length - 2] || "ComponentIndex";
 					}
 					variable = defaultName;
 				} else {
 					variable = exportName;
+				}
+
+				if(exportNames.has(variable)){
+					variable += `${exportNames.size + 1}`
+				}else{
+					exportNames.add(variable);
 				}
 
 				const { name, category, cover } = componentInfo[exportName];
