@@ -51,7 +51,6 @@ function createCompiler(config: MojitoCompilerConfig, isDev?: boolean) {
 /**
  * 发布生产包
  * @param config
- * @param callback
  */
 export function production(config: MojitoCompilerConfig) {
 	const { compiler, conf, exportComponents, externalInfo } =

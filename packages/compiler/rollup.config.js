@@ -1,6 +1,8 @@
-import pkg  from "./package.json"
+import pkg from "./package.json"
 import typescript from "@rollup/plugin-typescript";
-// import dts from "rollup-plugin-dts";
+import copy from 'rollup-plugin-copy'
+import dts from "rollup-plugin-dts";
+import fs from "fs"
 
 const banner = `/*!
   * ${pkg.name} ${pkg.version}
@@ -24,8 +26,11 @@ export default [
       }
     ],
     plugins: [
-      typescript({
-          tsconfig: './tsconfig.json'
+      typescript(),
+      copy({
+        targets: [
+          { src: 'src/types/**/*', dest: 'dist/types' },
+        ]
       })
     ]
   },
@@ -41,9 +46,18 @@ export default [
       typescript()
     ]
   },
-  // {
-  //   input: "src/index.ts",
-  //   output: [{ file: "dist/index.d.ts", format: "es", banner }],
-  //   plugins: [dts.default()]
-  // }
+  {
+    input: "./src/index.ts",
+    output: { format: "es", file: "dist/types/index.d.ts" },
+    plugins: [
+      dts.default(),
+      {
+        name: "clients",
+        banner: fs.readdirSync(`${__dirname}/src/types`)
+          .map(s => s.replace(/\.ts$/, "").replace(/\.d$/, ""))
+          .map(s => `/// <reference types="./${s}" />`)
+          .join("\n"),
+      },
+    ],
+  },
 ];

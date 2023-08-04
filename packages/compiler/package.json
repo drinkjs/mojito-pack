@@ -30,12 +30,14 @@
     "html-webpack-plugin": "^5.5.3",
     "jsdom": "^22.1.0",
     "memfs": "^4.2.0",
-    "mojito-vue-style-loader": "^1.0.4",
     "postcss-loader": "^7.3.3",
     "rollup": "^3.26.0",
+    "rollup-plugin-dts": "^5.3.1",
+    "shadow-style-loader": "^1.0.1",
     "style-loader": "^3.3.3",
     "systemjs": "^6.14.1",
     "ts-morph": "^19.0.0",
+    "vue-loader": "^17.2.2",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
@@ -45,8 +47,7 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "16.18.38",
-    "rollup-plugin-dts": "^5.3.0",
-    "tslib": "^2.6.0",
-    "vue-loader": "^17.2.2"
+    "rollup-plugin-copy": "^3.4.0",
+    "tslib": "^2.6.0"
   }
 }

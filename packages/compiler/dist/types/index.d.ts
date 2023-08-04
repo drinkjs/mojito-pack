@@ -1,13 +1,22 @@
-import "systemjs";
-import { MojitoCompilerConfig } from "./conf";
+
+/// <reference types="./client" />
+import { Configuration } from 'webpack';
+
+interface MojitoCompilerConfig extends Configuration {
+    entry: string;
+    externals?: Record<string, string[] | string>;
+    template?: string;
+}
+
 /**
  * 发布生产包
  * @param config
- * @param callback
  */
-export declare function production(config: MojitoCompilerConfig): void;
+declare function production(config: MojitoCompilerConfig): void;
 /**
  * 启动WebpackDevServer
  * @param config
  */
-export declare function devServer(config: MojitoCompilerConfig): void;
+declare function devServer(config: MojitoCompilerConfig): void;
+
+export { devServer, production };

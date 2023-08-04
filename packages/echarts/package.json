@@ -1,6 +1,6 @@
 {
-  "name": "echarts",
-  "version": "5.4.2",
+  "name": "mojito-echarts",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {

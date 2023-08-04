@@ -13,12 +13,14 @@ import {
 	ObjectLiteralExpression,
 } from "ts-morph";
 import { BasePack, EntryFile, MojitoCompilerConfig } from "./conf";
+import { boolean } from "yargs";
 
 export type ExportComponent = { exportName: string, name: string, category?: string, cover?: string }
 
 const TempDir = "node_modules/@mojito/__pack"
 
-export function getPathFiles(entry: string, extname?: string) {
+export function getPathFiles(entry: string, options: { extname?: string, recursion?: boolean }) {
+	const { extname, recursion } = options
 	const files: {
 		filename: string;
 		extname: string;
@@ -29,10 +31,22 @@ export function getPathFiles(entry: string, extname?: string) {
 	if (stat.isDirectory()) {
 		const paths = fs.readdirSync(entry);
 		paths.forEach((p) => {
-			const rels = getPathFiles(path.resolve(entry, p), extname);
-			files.push(...rels);
+			const currFile = path.resolve(entry, p);
+			if (recursion) {
+				const rels = getPathFiles(currFile, options);
+				files.push(...rels);
+			} else if (fs.lstatSync(currFile).isFile()) {
+				if (!extname || path.extname(currFile) === extname) {
+					files.push({
+						filename: currFile,
+						extname: path.extname(currFile),
+						basename: path.basename(currFile),
+						source: fs.readFileSync(currFile),
+					});
+				}
+			}
 		});
-	} else {
+	} else if (stat.isFile()) {
 		if (!extname || path.extname(entry) === extname) {
 			files.push({
 				filename: entry,
@@ -45,11 +59,17 @@ export function getPathFiles(entry: string, extname?: string) {
 	return files;
 }
 
-export function parseVue(filepath: string) {
+export function parseVue(entry: string, filepath: string) {
+	const pathArr = entry.split("/");
+	const filename = pathArr[pathArr.length - 1];
+	const pathname = pathArr[pathArr.length - 2];
 
 	const buildpath = path.resolve(process.cwd(), TempDir);
-	const files = getPathFiles(filepath, ".vue");
-
+	const files = getPathFiles(filepath, { extname: ".vue", recursion: pathname == "**" && filename=="*.vue" });
+	if(files.length === 0){
+		console.error("\x1b[43m%s\x1b[0m", "No components export");
+		process.exit(0);
+	}
 	if (fs.existsSync(buildpath)) {
 		fs.rmSync(buildpath, { recursive: true });
 	}
@@ -193,7 +213,7 @@ export function parseTs(tsEntry: string, enptyPath: string) {
 
 export function parseEntry(entry: string, filepath: string, basePack?: BasePack) {
 	if (basePack === BasePack.vue) {
-		return parseVue(filepath);
+		return parseVue(entry, filepath);
 	} else if (basePack === BasePack.react) {
 		return parseTs(entry, filepath)
 	} else {
@@ -222,8 +242,8 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 	const filterImports: string[] = [];
 
 	const exportComponents: ExportComponent[] = [];
-	const exportNames = new Set()	;
-	
+	const exportNames = new Set();
+
 	allComponents.forEach((component) => {
 		for (let filePath in component) {
 			const componentInfo = component[filePath];
@@ -239,7 +259,7 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 			importFile = importFile
 				.substring(0, importFile.lastIndexOf("."))
 				.replace(/\\/g, "/");
-			
+
 			for (const exportName in componentInfo) {
 				let variable = "";
 				if (exportName === "default") {
@@ -256,9 +276,9 @@ export function createEntry({ entry }: MojitoCompilerConfig, opts: { basePack?: 
 					variable = exportName;
 				}
 
-				if(exportNames.has(variable)){
+				if (exportNames.has(variable)) {
 					variable += `${exportNames.size + 1}`
-				}else{
+				} else {
 					exportNames.add(variable);
 				}
 

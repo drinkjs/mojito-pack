@@ -21,38 +21,6 @@ var http = require('http');
 var jsdom = require('jsdom');
 var detect = require('detect-port');
 
-/******************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise, SuppressedError, Symbol */
-
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-}
-
-typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
-    var e = new Error(message);
-    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
-};
-
 const EntryFile = "./mojito.entry.ts";
 var BasePack;
 (function (BasePack) {
@@ -66,7 +34,6 @@ function loaderPath(loader) {
     return path.resolve(__dirname, `../node_modules/${loader}`);
 }
 var webpackConfig = (config, pkg, { isDev, basePack }) => {
-    var _a, _b;
     const { entry } = config;
     if (!config.output) {
         config.output = {};
@@ -92,9 +59,11 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
     const getCssLoaders = (isModule, ...loaders) => {
         return [
             {
-                loader: loaderPath("mojito-vue-style-loader"),
+                loader: loaderPath("shadow-style-loader"),
+                // loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
                 options: {
-                    pkg,
+                    flag: `${pkg.name}@${pkg.version}`,
+                    event: "__MojitoStyleLoader__"
                 }
             },
             {
@@ -199,23 +168,37 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
     const mergedConfig = webpackMerge.merge(config, baseConfig);
     delete mergedConfig.entry.polyfills;
     delete mergedConfig.entry.styles;
-    (_a = mergedConfig.optimization) === null || _a === void 0 ? true : delete _a.runtimeChunk;
-    (_b = mergedConfig.optimization) === null || _b === void 0 ? true : delete _b.splitChunks;
+    delete mergedConfig.optimization?.runtimeChunk;
+    delete mergedConfig.optimization?.splitChunks;
     return mergedConfig;
 };
 
 const TempDir = "node_modules/@mojito/__pack";
-function getPathFiles(entry, extname) {
+function getPathFiles(entry, options) {
+    const { extname, recursion } = options;
     const files = [];
     const stat = fs.lstatSync(entry);
     if (stat.isDirectory()) {
         const paths = fs.readdirSync(entry);
         paths.forEach((p) => {
-            const rels = getPathFiles(path.resolve(entry, p), extname);
-            files.push(...rels);
+            const currFile = path.resolve(entry, p);
+            if (recursion) {
+                const rels = getPathFiles(currFile, options);
+                files.push(...rels);
+            }
+            else if (fs.lstatSync(currFile).isFile()) {
+                if (!extname || path.extname(currFile) === extname) {
+                    files.push({
+                        filename: currFile,
+                        extname: path.extname(currFile),
+                        basename: path.basename(currFile),
+                        source: fs.readFileSync(currFile),
+                    });
+                }
+            }
         });
     }
-    else {
+    else if (stat.isFile()) {
         if (!extname || path.extname(entry) === extname) {
             files.push({
                 filename: entry,
@@ -227,9 +210,16 @@ function getPathFiles(entry, extname) {
     }
     return files;
 }
-function parseVue(filepath) {
+function parseVue(entry, filepath) {
+    const pathArr = entry.split("/");
+    const filename = pathArr[pathArr.length - 1];
+    const pathname = pathArr[pathArr.length - 2];
     const buildpath = path.resolve(process.cwd(), TempDir);
-    const files = getPathFiles(filepath, ".vue");
+    const files = getPathFiles(filepath, { extname: ".vue", recursion: pathname == "**" && filename == "*.vue" });
+    if (files.length === 0) {
+        console.error("\x1b[43m%s\x1b[0m", "No components export");
+        process.exit(0);
+    }
     if (fs.existsSync(buildpath)) {
         fs.rmSync(buildpath, { recursive: true });
     }
@@ -360,7 +350,7 @@ function parseTs(tsEntry, enptyPath) {
 }
 function parseEntry(entry, filepath, basePack) {
     if (basePack === BasePack.vue) {
-        return parseVue(filepath);
+        return parseVue(entry, filepath);
     }
     else if (basePack === BasePack.react) {
         return parseTs(entry);
@@ -501,12 +491,11 @@ function createServer(outPath, publicPath, cb) {
         process.exit(1);
     });
 }
-function getComponentInfo(pkgName, pkgVersion, cdn) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("Checking components...");
-        const systemPath = path.resolve(__dirname, "../node_modules/systemjs/dist/system.min.js");
-        const importMaps = Object.assign(Object.assign({}, cdn), { [pkgName]: `http://127.0.0.1:${port}/${pkgName}.js` });
-        const html = `
+async function getComponentInfo(pkgName, pkgVersion, cdn) {
+    console.log("Checking components...");
+    const systemPath = path.resolve(__dirname, "../node_modules/systemjs/dist/system.min.js");
+    const importMaps = { ...cdn, [pkgName]: `http://127.0.0.1:${port}/${pkgName}.js` };
+    const html = `
 		<html>
 		<head>
 			<script src="file://${systemPath}"></script>
@@ -532,12 +521,11 @@ function getComponentInfo(pkgName, pkgVersion, cdn) {
 		</body>
 		</html>
 	`;
-        const { window } = new jsdom.JSDOM(html, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:${port}` });
-        return new Promise((resolve) => {
-            window.onComponents = (components) => {
-                resolve(components);
-            };
-        });
+    const { window } = new jsdom.JSDOM(html, { runScripts: "dangerously", resources: "usable", url: `http://127.0.0.1:${port}` });
+    return new Promise((resolve) => {
+        window.onComponents = (components) => {
+            resolve(components);
+        };
     });
 }
 function outputBuild(outPath) {
@@ -559,7 +547,7 @@ const pkg = require(`${process.cwd()}/package.json`);
 pkg.name = pkg.name.replace(/[\\\/]/g, "-");
 function checkBase() {
     const { dependencies, devDependencies } = pkg;
-    const allDep = Object.assign(Object.assign({}, dependencies), devDependencies);
+    const allDep = { ...dependencies, ...devDependencies };
     if (allDep["@mojito/vue-pack"]) {
         return BasePack.vue;
     }
@@ -592,13 +580,12 @@ function createCompiler(config, isDev) {
 /**
  * 发布生产包
  * @param config
- * @param callback
  */
 function production(config) {
     const { compiler, conf, exportComponents, externalInfo } = createCompiler(config);
-    compiler.run((err, stats) => __awaiter(this, void 0, void 0, function* () {
-        if (err || (stats === null || stats === void 0 ? void 0 : stats.hasErrors())) {
-            console.error("\x1b[43m%s\x1b[0m", "Error:", (err === null || err === void 0 ? void 0 : err.message) || (stats === null || stats === void 0 ? void 0 : stats.compilation.errors));
+    compiler.run(async (err, stats) => {
+        if (err || stats?.hasErrors()) {
+            console.error("\x1b[43m%s\x1b[0m", "Error:", err?.message || stats?.compilation.errors);
             process.exit(1);
         }
         compiler.close((closeErr) => {
@@ -610,8 +597,8 @@ function production(config) {
                 process.exit(1);
             }
         });
-        createServer(config.output.path, config.output.publicPath, () => __awaiter(this, void 0, void 0, function* () {
-            const components = yield getComponentInfo(pkg.name, pkg.version, externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn);
+        createServer(config.output.path, config.output.publicPath, async () => {
+            const components = await getComponentInfo(pkg.name, pkg.version, externalInfo?.cdn);
             if (components.length === 0) {
                 throw new Error("No components are available");
             }
@@ -632,28 +619,27 @@ function production(config) {
             fs.writeFileSync(`${conf.output.path}/mojito-pack.json`, JSON.stringify({
                 name: pkg.name,
                 version: pkg.version,
-                external: externalInfo === null || externalInfo === void 0 ? void 0 : externalInfo.cdn,
+                external: externalInfo?.cdn,
                 components: infos,
             }));
             process.exit(0);
-        }));
-    }));
+        });
+    });
 }
 /**
  * 启动WebpackDevServer
  * @param config
  */
 function devServer(config) {
-    var _a, _b;
     const { compiler, conf, externalInfo } = createCompiler(config, true);
     // 读取模版内容, 并替换importMap和import file内容
     let template = fs
-        .readFileSync((_a = config.template) !== null && _a !== void 0 ? _a : path.resolve(__dirname, "./template.html"))
+        .readFileSync(config.template ?? path.resolve(__dirname, "./template.html"))
         .toString();
     if (externalInfo) {
         template = template.replace("{/* IMPORT_MAP */}", JSON.stringify(externalInfo.cdn));
     }
-    template = template.replace("IMPORT_FILE", (_b = conf.output) === null || _b === void 0 ? void 0 : _b.filename).replace("PkgName", pkg.name).replace("PkgVersion", pkg.version);
+    template = template.replace("IMPORT_FILE", conf.output?.filename).replace("PkgName", pkg.name).replace("PkgVersion", pkg.version);
     fs.writeFileSync(path.resolve(__dirname, "./index.html"), template);
     // compiler.hooks.watchRun.tap("WatchRun", (comp) => {
     // 	if (comp.modifiedFiles) {
@@ -665,10 +651,10 @@ function devServer(config) {
     // });
     const devServerOptions = conf.devServer;
     const server = new WebpackDevServer(devServerOptions, compiler);
-    const runServer = () => __awaiter(this, void 0, void 0, function* () {
+    const runServer = async () => {
         console.log("Starting server...");
-        yield server.start();
-    });
+        await server.start();
+    };
     runServer();
 }
 

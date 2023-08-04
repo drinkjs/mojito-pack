@@ -9,7 +9,7 @@ import { BasePack, MojitoCompilerConfig } from "./conf";
 const progress = new webpack.ProgressPlugin();
 const cwd = process.cwd();
 
-function loaderPath(loader:string){
+function loaderPath(loader: string) {
 	return path.resolve(__dirname, `../node_modules/${loader}`)
 }
 
@@ -46,12 +46,14 @@ export default (
 		plugins.push(new VueLoaderPlugin());
 	}
 
-	const getCssLoaders = (isModule:boolean, ...loaders:any[])=>{
+	const getCssLoaders = (isModule: boolean, ...loaders: any[]) => {
 		return [
 			{
-				loader: loaderPath("mojito-vue-style-loader"),
+				loader: loaderPath("shadow-style-loader"),
+				// loader: "E:/project/drinkjs/mojito-vue-style-loader/index.js",
 				options: {
-					pkg,
+					flag: `${pkg.name}@${pkg.version}`,
+					event: "__MojitoStyleLoader__"
 				}
 			},
 			{
@@ -92,7 +94,7 @@ export default (
 		plugins,
 		optimization: {
 			minimizer: [
-				new EsbuildPlugin({target: 'es2020'}),
+				new EsbuildPlugin({ target: 'es2020' }),
 			],
 		},
 		module: {
