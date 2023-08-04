@@ -8,7 +8,7 @@
     "dev": "mojito --dev"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@mojito/compiler": "workspace:^",
     "@mojito/react-pack": "workspace:^",
