@@ -132,7 +132,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
                     // exclude: /node_modules/,
                 },
                 {
-                    test: /\.(webp|png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg)$/,
+                    test: /\.(webp|png|jpg|gif|jpeg|woff|woff2|eot|ttf|svg|mp4|mp3|webm)$/i,
                     type: 'asset/resource'
                 },
                 {
