@@ -126,9 +126,4 @@ function Global({data, isPause, gref}: EarthProps){
   )
 }
 
-export default memo(Global, (prev, next) => {
-  if((prev.isPause === next.isPause) && prev.isPause){
-    return false;
-  }
-  return prev.data !== next.data || prev.isPause !== next.isPause;
-})
+export default memo(Global, (prev, next) => prev.data === next.data)

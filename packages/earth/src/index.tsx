@@ -80,7 +80,7 @@ export default function Earth({ data, onControl, positions}: EarthProps) {
 					gr: { x: grot.x, y: grot.y, z: grot.z },
 				});
 			}
-		}, 100),
+		}, 50),
 		[isControl, onControl]
 	);
 
