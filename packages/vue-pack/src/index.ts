@@ -5,12 +5,14 @@ import { nanoid } from "nanoid";
 export interface IMojitoComponentProps {
   __display: "editor" | "viewer";
   __style?: Record<string, any>;
+	__root: Element | ShadowRoot,
   __updateProps?: (props:Record<string, any>)=>void
 }
 
 export const MojitoComponentProps = {
 	__display: String,
 	__style: Object,
+	__root: Object,
 	__updateProps: Function
 }
 

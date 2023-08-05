@@ -1,5 +1,5 @@
 <template>
-	<ElButton v-bind="attributes" @click="$emit('onClick')">{{ text }}</ElButton>
+	<ElButton v-bind="attributes" :type="type" @click="$emit('onClick')">{{ text }}</ElButton>
 </template>
 
 <script lang="ts">
@@ -14,6 +14,7 @@ const Button = defineComponent({
   props: {
     ...MojitoComponentProps,
     text: String,
+    type: String,
     attributes: Object
   },
 })
@@ -28,6 +29,10 @@ export const PackButton = CreatePack(Button, {
       name:"文字",
       type:"string",
       default:"按钮"
+    },
+    type:{
+      name:"类型",
+      type: ["primary", "success",  "info",  "warning",  "danger"]
     },
     attributes:{
       name:"属性",

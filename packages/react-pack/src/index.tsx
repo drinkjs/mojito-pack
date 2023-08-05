@@ -5,8 +5,9 @@ import { nanoid } from "nanoid";
 type AppActionRef =  React.MutableRefObject<{updateProps: (props: Record<string, any>) => void} | undefined>
 
 export interface MojitoComponentProps {
-  __display: "editor" | "viewer";
-  __style?: Record<string, any>;
+  __display: "editor" | "viewer",
+  __style?: Record<string, any>,
+	__root: Element | ShadowRoot,
   __UpdateProps?: (props:Record<string, any>)=>void
 }
 

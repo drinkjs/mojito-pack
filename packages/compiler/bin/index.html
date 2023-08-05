@@ -75,10 +75,10 @@ const app = document.getElementById("app");
 
 const sys = new System.constructor();
 sys.addImportMap({
-  "imports": {}
+  "imports": {/* IMPORT_MAP */}
 })
 
-sys.import("./mojito-element.js").then((data)=>{
+sys.import("./mojito-antd.js").then((data)=>{
   console.log(data);
 
   for(const key in data){
