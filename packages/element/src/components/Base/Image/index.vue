@@ -3,7 +3,7 @@
 		v-bind="attributes"
 		:fit="fit"
 		:src="image"
-		style="width: 100%; height: 100%"
+		style="width: 100%; height: 100%;background: none;"
 	></ElImage>
 </template>
 
@@ -29,7 +29,7 @@ const Image = defineComponent({
 		}
 	},
 	watch:{
-		'src'(newVal){
+		src(newVal){
 			this.image = newVal || emptyImg.data
 		}
 	}

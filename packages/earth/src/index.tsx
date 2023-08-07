@@ -27,30 +27,23 @@ export default function Earth({ data, onControl, positions}: EarthProps) {
 	const [isControl, setIsControl] = useState(false);
 	const controlRef = useRef<any>();
 	const groupRef = useRef<THREE.Group | null>(null);
-	const [pos, setPos] = useState<typeof positions | undefined>();
 
 	useEffect(()=>{
-		if(isControl){
-			setPos(undefined);
-		}else{
-			setPos(positions);
+		if(!isControl){
+			if(positions){
+				const {cp, cr, gp, gr} = positions;
+				if(groupRef.current){
+					groupRef.current.position.set(gp.x, gp.y, gp.z);
+					groupRef.current.rotation.set(gr.x, gr.y, gr.z);
+				}
+	
+				if(controlRef.current && controlRef.current.object){
+					controlRef.current.object.position.set(cp.x, cp.y, cp.z);
+					controlRef.current.object.rotation.set(cr.x, cr.y, cr.z);
+				}
+			}
 		}
 	}, [positions, isControl])
-
-	useEffect(()=>{
-		if(pos){
-			const {cp, cr, gp, gr} = pos;
-			if(groupRef.current){
-				groupRef.current.position.set(gp.x, gp.y, gp.z);
-				groupRef.current.rotation.set(gr.x, gr.y, gr.z);
-			}
-
-			if(controlRef.current && controlRef.current.object){
-				controlRef.current.object.position.set(cp.x, cp.y, cp.z);
-				controlRef.current.object.rotation.set(cr.x, cr.y, cr.z);
-			}
-		}
-	}, [pos, isControl])
 
 	const startHandler = useCallback(() => {
 		if(stopTimer){
@@ -80,7 +73,7 @@ export default function Earth({ data, onControl, positions}: EarthProps) {
 					gr: { x: grot.x, y: grot.y, z: grot.z },
 				});
 			}
-		}, 50),
+		}, 100),
 		[isControl, onControl]
 	);
 
