@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { CreatePack } from "@mojito/react-pack";
 import ChartContainer, { ChartProps } from "../../common/ChartContainer";
 import cover from "./bar-simple.webp"
+import echarts from "echarts";
 
 type BarChartData = {
 	name: string;
@@ -10,11 +11,12 @@ type BarChartData = {
 };
 
 interface BarChartProps extends ChartProps<BarChartData[]> {
-
+	colors?:string[] 
 }
 
 function BarChart({
 	data = [],
+	colors,
 	option,
 	...restProps
 }: BarChartProps) {
@@ -47,11 +49,17 @@ function BarChart({
 				{
 					data: data.map((v) => v.value),
 					type: "bar",
+					itemStyle: {
+						color: colors ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+							{ offset: 0, color: colors[0] },
+							{ offset: 1, color: colors[1] }
+						]) : undefined
+					},
 				},
 			],
 		};
 		return merge(opt, option);
-	}, [data, option]);
+	}, [data, option, colors]);
 
 	return <ChartContainer {...restProps} option={opts} />;
 }
@@ -63,6 +71,10 @@ export default CreatePack(
 		category: "柱状图", 
 		cover,
 		props: {
+			colors: {
+				name:"颜色",
+				type:"array",
+			},
 			data: {
 				name: "数据",
 				description: '图表数据[{name:"类型", value:100}, ...]',
