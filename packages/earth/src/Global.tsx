@@ -46,14 +46,16 @@ for (let point of mapPoints.points) {
 interface EarthProps {
 	data: { lat: string; lng: string; value: number }[];
   isPause?:boolean
-  gref?:React.MutableRefObject<THREE.Group | null>
+  gref?:React.MutableRefObject<{current:THREE.Group, setPause:(val:boolean)=>void} | undefined>
 }
 
-function Global({data, isPause, gref}: EarthProps){
+function Global({data, gref}: EarthProps){
   const groupRef = useRef<THREE.Group | null>(null);
   const [earthMesh, setEarthMesh] = useState<THREE.Mesh | null>(null);
+  const pauseRef = useRef(false);
+
   useFrame((state, delta) => {
-    if(groupRef.current && !isPause){
+    if(groupRef.current && !pauseRef.current){
       groupRef.current.rotation.y += 0.001;
     }
     if (!state.gl.domElement?.parentElement) return
@@ -69,7 +71,14 @@ function Global({data, isPause, gref}: EarthProps){
 
   useImperativeHandle(
     gref,
-    () => groupRef.current!,
+    () => {
+      return {
+        current: groupRef.current!,
+        setPause: (val:boolean)=>{
+          pauseRef.current = val;
+        }
+      }
+    },
     []
   );
 
@@ -127,6 +136,5 @@ function Global({data, isPause, gref}: EarthProps){
 }
 
 export default memo(Global, (prev, next) => {
-  if(prev.isPause !== next.isPause) return false
-  return true;
+  return prev.data === next.data;
 })

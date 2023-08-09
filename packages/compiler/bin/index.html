@@ -75,10 +75,10 @@ const app = document.getElementById("app");
 
 const sys = new System.constructor();
 sys.addImportMap({
-  "imports": {"echarts":"http://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"}
+  "imports": {}
 })
 
-sys.import("./mojito-echarts.js").then((data)=>{
+sys.import("./mojito-earth.js").then((data)=>{
   console.log(data);
 
   for(const key in data){
