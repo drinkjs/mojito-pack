@@ -14,9 +14,9 @@ pkg.name = pkg.name.replace(/[\\\/]/g, "-");
 function checkBase() {
 	const { dependencies, devDependencies } = pkg;
 	const allDep = { ...dependencies, ...devDependencies };
-	if (allDep["@mojito/vue-pack"]) {
+	if (allDep["@drinkjs/mojito-vue-pack"]) {
 		return BasePack.vue;
-	} else if (allDep["@mojito/react-pack"]) {
+	} else if (allDep["@drinkjs/mojito-react-pack"]) {
 		return BasePack.react;
 	}
 }

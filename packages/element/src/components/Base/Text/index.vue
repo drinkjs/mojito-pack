@@ -3,9 +3,9 @@
 </template>
 
 <script lang="ts">
-import { MojitoComponentProps } from "@mojito/vue-pack";
+import { MojitoComponentProps } from "@drinkjs/mojito-vue-pack";
 import "element-plus/dist/index.css";
-import { CreatePack } from "@mojito/vue-pack";
+import { CreatePack } from "@drinkjs/mojito-vue-pack";
 import { defineComponent } from "vue";
 
 const Text = defineComponent({

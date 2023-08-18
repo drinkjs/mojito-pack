@@ -5,7 +5,7 @@ import { OrbitControls } from "@react-three/drei";
 import Global from "./Global";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { technique, throttle } from "./common/util";
-import { MojitoComponentProps } from "@mojito/react-pack";
+import { MojitoComponentProps } from "@drinkjs/mojito-react-pack";
 
 type XYZ = { x: number; y: number; z: number };
 

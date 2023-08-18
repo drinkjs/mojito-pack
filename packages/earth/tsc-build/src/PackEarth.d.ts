@@ -2,7 +2,7 @@
 import Earth from "./index";
 declare const _default: new () => {
     __component: typeof Earth;
-    __info: import("@mojito/react-pack").ComponentInfo;
+    __info: import("@drinkjs/mojito-react-pack").ComponentInfo;
     __root: import("react-dom/client").Root | null;
     __props?: Record<string, any> | undefined;
     __id: string;
@@ -14,7 +14,7 @@ declare const _default: new () => {
         version: string;
     };
     readonly component: typeof Earth;
-    readonly componentInfo: import("@mojito/react-pack").ComponentInfo;
+    readonly componentInfo: import("@drinkjs/mojito-react-pack").ComponentInfo;
     readonly componentId: string;
     mount(container: Element | DocumentFragment, props?: Record<string, any> | undefined, onMount?: ((props?: Record<string, any> | undefined) => void) | undefined): void;
     unmount(): void;

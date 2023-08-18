@@ -1,5 +1,5 @@
 import { QRCode } from "antd";
-import { CreatePack } from "@mojito/react-pack";
+import { CreatePack } from "@drinkjs/mojito-react-pack";
 
 const PackButton = ({
   value,

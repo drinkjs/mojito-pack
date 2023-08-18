@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { CreatePack, MojitoComponentProps } from "@mojito/react-pack";
+import { CreatePack, MojitoComponentProps } from "@drinkjs/mojito-react-pack";
 import Container from "../../../common/Container"
 
 interface PackButtonProps extends MojitoComponentProps{

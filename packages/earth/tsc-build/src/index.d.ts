@@ -1,4 +1,4 @@
-import { MojitoComponentProps } from "@mojito/react-pack";
+import { MojitoComponentProps } from "@drinkjs/mojito-react-pack";
 type XYZ = {
     x: number;
     y: number;

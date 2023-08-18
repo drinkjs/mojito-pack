@@ -1,4 +1,4 @@
-import { CreatePack } from "@mojito/react-pack";
+import { CreatePack } from "@drinkjs/mojito-react-pack";
 import Earth from "./index";
 import defaultData from "./data/defaultData.json";
 

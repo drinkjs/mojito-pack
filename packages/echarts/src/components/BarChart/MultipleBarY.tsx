@@ -1,6 +1,6 @@
 import { merge } from "lodash-es";
 import { useMemo } from "react";
-import { CreatePack } from "@mojito/react-pack";
+import { CreatePack } from "@drinkjs/mojito-react-pack";
 import ChartContainer, { ChartProps } from "../../common/ChartContainer";
 import cover from "./bar-y-category.webp";
 

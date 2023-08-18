@@ -1,7 +1,7 @@
 import ChartContainer, { ChartProps } from "../../common/ChartContainer";
 import { merge } from "lodash-es";
 import { useMemo } from "react";
-import { CreatePack } from "@mojito/react-pack";
+import { CreatePack } from "@drinkjs/mojito-react-pack";
 import cover from "./scatter-simple.webp"
 
 interface ScatterChartProps extends ChartProps<[number, number][]> {
