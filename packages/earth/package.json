@@ -11,8 +11,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@mojito/compiler": "workspace:^",
-    "@mojito/react-pack": "workspace:^",
+    "@drinkjs/mojito-compiler": "workspace:^",
+    "@drinkjs/mojito-react-pack": "workspace:^",
     "@react-three/drei": "^9.78.1",
     "@react-three/fiber": "^8.13.4",
     "@types/d3-scale": "^4.0.3",

@@ -1,6 +1,6 @@
 {
-  "name": "@mojito/compiler",
-  "version": "1.0.0",
+  "name": "@drinkjs/mojito-compiler",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -16,6 +16,10 @@
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs",
     "pack": "npm pack --dry-run"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "author": "",
   "license": "MIT",

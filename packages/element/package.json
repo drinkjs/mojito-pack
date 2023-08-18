@@ -15,8 +15,8 @@
     "vue": "^3.3.4"
   },
   "devDependencies":{
-    "@mojito/compiler": "workspace:^",
-    "@mojito/vue-pack": "workspace:^",
+    "@drinkjs/mojito-compiler": "workspace:^",
+    "@drinkjs/mojito-vue-pack": "workspace:^",
     "typescript": "^5.1.6"
   }
 }
