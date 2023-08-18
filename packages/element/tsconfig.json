@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports":true,
+    "target": "es2016",
+    "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "tsc-build",
+    "noEmit": false,
+    "noImplicitAny": false,
+    "resolveJsonModule":true,
+    "baseUrl": "./",
+    
+  },
+  "vueCompilerOptions": {
+    "target": 3.3
+  },
+  "include": [
+    "src"
+  ]
+}

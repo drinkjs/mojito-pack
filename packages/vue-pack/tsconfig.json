@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist",
+    "noEmit": false,
+    "baseUrl": "./"
+  },
+  "vueCompilerOptions": {
+    "target": 3.3
+  },
+  "include": [
+    "src",
+  ]
+}

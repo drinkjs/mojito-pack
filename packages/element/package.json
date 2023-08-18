@@ -1,0 +1,22 @@
+{
+  "name": "mojito-element",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "mojito",
+    "dev": "mojito --dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "element-plus": "^2.3.8",
+    "vue": "^3.3.4"
+  },
+  "devDependencies":{
+    "@mojito/compiler": "workspace:^",
+    "@mojito/vue-pack": "workspace:^",
+    "typescript": "^5.1.6"
+  }
+}

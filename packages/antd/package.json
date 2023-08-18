@@ -1,0 +1,26 @@
+{
+  "name": "mojito-antd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "mojito",
+    "dev": "mojito --dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@mojito/compiler": "workspace:^",
+    "@mojito/react-pack": "workspace:^",
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@ant-design/cssinjs": "^1.16.1",
+    "antd": "^5.8.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

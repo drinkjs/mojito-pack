@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.14.1/system.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script>
+  function addStyles (styles) {
+  const shadowRoot = document.head
+  const injectedStyles =
+  shadowRoot._injectedStyles ||
+    (shadowRoot._injectedStyles = {})
+  for (let i = 0; i < styles.length; i++) {
+    const item = styles[i]
+    const style = injectedStyles[item.id]
+    if (!style) {
+      for (let j = 0; j < item.parts.length; j++) {
+        addStyle(item.parts[j], shadowRoot)
+      }
+      injectedStyles[item.id] = true
+    }
+  }
+}
+
+function createStyleElement (shadowRoot) {
+  const styleElement = document.createElement('style')
+  shadowRoot.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj, shadowRoot) {
+  const styleElement = createStyleElement(shadowRoot)
+  const css = obj.css
+  const media = obj.media
+  // const sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
+  }
+
+  // if (sourceMap) {
+  //   // https://developer.chrome.com/devtools/docs/javascript-debugging
+  //   // this makes source maps inside style tags work properly in Chrome
+  //   css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+  //   // http://stackoverflow.com/a/26603875
+  //   css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+  // }
+
+  // if (styleElement.styleSheet) {
+  //   styleElement.styleSheet.cssText = css
+  // } else {
+  //   while (styleElement.firstChild) {
+  //     styleElement.removeChild(styleElement.firstChild)
+  //   }
+  //   styleElement.appendChild(document.createTextNode(css))
+  // }
+
+  while (styleElement.firstChild) {
+    styleElement.removeChild(styleElement.firstChild)
+  }
+  styleElement.appendChild(document.createTextNode(css))
+}
+</script>
+<script>
+document.addEventListener("__MojitoStyleLoader__", (e)=>{
+  addStyles(e.detail.styles)
+})
+const app = document.getElementById("app");
+
+const sys = new System.constructor();
+sys.addImportMap({
+  "imports": {}
+})
+
+sys.import("./mojito-earth.js").then((data)=>{
+  console.log(data);
+
+  for(const key in data){
+    console.log(key)
+    const compPromise = data[key];
+    if(typeof compPromise === "function"){
+      compPromise().then((Component)=>{
+        const comp = new Component()
+        console.log(comp)
+        if(comp.mount && comp.component){
+        const {componentInfo} = comp;
+        const props = {};
+        if(componentInfo && componentInfo.props){
+          Object.keys(componentInfo.props).forEach((key)=>{
+            props[key] = componentInfo.props[key].default
+          })
+        }
+        const box = document.createElement("div");
+        box.id = key;
+        box.style.width = "500px";
+        box.style.height = "300px";
+        box.style.padding = "16px";
+        app.appendChild(box);
+        comp.mount(box, props)
+      }
+    })
+    }
+  }
+ });
+</script>
+</html>
+
+
