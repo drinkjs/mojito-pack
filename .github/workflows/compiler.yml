@@ -1,9 +1,6 @@
 name: compiler
 
-on:
-  push:
-    tags:
-      - compiler.**
+on: workflow_dispatch
 
 jobs:
   publish_compiler:
@@ -12,6 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          ref: main
           sparse-checkout: packages/compiler
           token: ${{ secrets.TOKEN }}
       - uses: actions/setup-node@v3
