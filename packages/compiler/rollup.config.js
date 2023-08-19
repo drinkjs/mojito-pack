@@ -30,6 +30,7 @@ export default [
       copy({
         targets: [
           { src: 'src/types/**/*', dest: 'dist/types' },
+          { src: 'src/systemjs/**/*', dest: 'dist/systemjs' },
         ]
       })
     ]
@@ -40,6 +41,7 @@ export default [
       {
         format: "cjs",
         file: "bin/index.js",
+        banner: "#!/usr/bin/env node"
       },
     ],
     plugins: [

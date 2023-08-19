@@ -1,5 +1,5 @@
 /*!
-  * @drinkjs/mojito-compiler 1.0.1
+  * @drinkjs/mojito-compiler 1.0.5
   * MIT license
 */
 
@@ -28,9 +28,12 @@ var BasePack;
     BasePack["react"] = "react";
 })(BasePack || (BasePack = {}));
 
-const progress = new webpack.ProgressPlugin();
+const webpackProgress = new webpack.ProgressPlugin();
 const cwd = process.cwd();
 function loaderPath(loader) {
+    if (fs.existsSync(path.resolve(process.cwd(), `./node_modules/${loader}`))) {
+        return path.resolve(process.cwd(), `./node_modules/${loader}`);
+    }
     return path.resolve(__dirname, `../node_modules/${loader}`);
 }
 var webpackConfig = (config, pkg, { isDev, basePack }) => {
@@ -51,7 +54,7 @@ var webpackConfig = (config, pkg, { isDev, basePack }) => {
         }));
     }
     else {
-        plugins.push(progress);
+        plugins.push(webpackProgress);
     }
     if (basePack === BasePack.vue) {
         plugins.push(new vueLoader.VueLoaderPlugin());
@@ -493,7 +496,7 @@ function createServer(outPath, publicPath, cb) {
 }
 async function getComponentInfo(pkgName, pkgVersion, cdn) {
     console.log("Checking components...");
-    const systemPath = path.resolve(__dirname, "../node_modules/systemjs/dist/system.min.js");
+    const systemPath = path.resolve(__dirname, "../dist/systemjs/dist/system.min.js");
     const importMaps = { ...cdn, [pkgName]: `http://127.0.0.1:${port}/${pkgName}.js` };
     const html = `
 		<html>

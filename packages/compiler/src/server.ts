@@ -45,7 +45,7 @@ export function createServer(outPath: string, publicPath: string, cb: (err?: any
 
 export async function getComponentInfo(pkgName: string, pkgVersion: string, cdn?: Record<string, string>) {
   console.log("Checking components...");
-  const systemPath = path.resolve(__dirname, "../node_modules/systemjs/dist/system.min.js")
+  const systemPath = path.resolve(__dirname, "../dist/systemjs/dist/system.min.js")
   const importMaps = { ...cdn, [pkgName]: `http://127.0.0.1:${port}/${pkgName}.js` }
   const html = `
 		<html>

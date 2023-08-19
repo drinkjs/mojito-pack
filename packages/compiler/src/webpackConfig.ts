@@ -5,11 +5,15 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
 import { EsbuildPlugin } from "esbuild-loader";
 import { BasePack, MojitoCompilerConfig } from "./conf";
+import fs from "fs"
 
-const progress = new webpack.ProgressPlugin();
+const webpackProgress = new webpack.ProgressPlugin();
 const cwd = process.cwd();
 
 function loaderPath(loader: string) {
+	if(fs.existsSync(path.resolve(process.cwd(), `./node_modules/${loader}`))){
+		return path.resolve(process.cwd(), `./node_modules/${loader}`);
+	}
 	return path.resolve(__dirname, `../node_modules/${loader}`)
 }
 
@@ -39,7 +43,7 @@ export default (
 			})
 		);
 	} else {
-		plugins.push(progress);
+		plugins.push(webpackProgress);
 	}
 
 	if (basePack === BasePack.vue) {
