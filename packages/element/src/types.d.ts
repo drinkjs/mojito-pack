@@ -1,2 +1,2 @@
-/// <reference types="@mojito/compiler" />
+/// <reference types="@drinkjs/mojito-compiler" />
 
