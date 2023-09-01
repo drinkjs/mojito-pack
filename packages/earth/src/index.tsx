@@ -24,18 +24,26 @@ interface EarthProps extends MojitoComponentProps {
 let stopTimer: any;
 
 export default function Earth({ data, onControl, positions }: EarthProps) {
-	const isControlRef = useRef(false)
+	const isControlRef = useRef(false);
 	const controlRef = useRef<any>();
 	const groupRef = useRef<{
 		current: THREE.Group;
 		setPause: (val: boolean) => void;
 	}>();
 
+	const restartGlobal = useCallback(
+		technique(() => {
+			groupRef.current!.setPause(false);
+		}, 2000),
+		[]
+	);
+
 	useEffect(() => {
 		if (!isControlRef.current) {
-			if (positions) {
+			if (positions && groupRef.current) {
+				groupRef.current.setPause(true);
 				const { cp, cr, gp, gr } = positions;
-				const globalGroup = groupRef.current?.current;
+				const globalGroup = groupRef.current.current;
 				if (globalGroup) {
 					globalGroup.position.set(gp.x, gp.y, gp.z);
 					globalGroup.rotation.set(gr.x, gr.y, gr.z);
@@ -45,6 +53,7 @@ export default function Earth({ data, onControl, positions }: EarthProps) {
 					controlRef.current.object.position.set(cp.x, cp.y, cp.z);
 					controlRef.current.object.rotation.set(cr.x, cr.y, cr.z);
 				}
+				restartGlobal();
 			}
 		}
 	}, [positions]);
@@ -54,8 +63,8 @@ export default function Earth({ data, onControl, positions }: EarthProps) {
 			clearTimeout(stopTimer);
 		}
 		isControlRef.current = true;
-		if(groupRef.current?.setPause){
-			groupRef.current.setPause(true)
+		if (groupRef.current?.setPause) {
+			groupRef.current.setPause(true);
 		}
 	}, []);
 
@@ -65,16 +74,21 @@ export default function Earth({ data, onControl, positions }: EarthProps) {
 		}
 		stopTimer = setTimeout(() => {
 			isControlRef.current = false;
-			if(groupRef.current?.setPause){
-				groupRef.current?.setPause(false)
+			if (groupRef.current?.setPause) {
+				groupRef.current?.setPause(false);
 			}
 		}, 2000);
-	}, [onControl]);
+	}, []);
 
 	const changeHandler = useCallback(
 		throttle(() => {
 			const globalGroup = groupRef.current?.current;
-			if (isControlRef.current  && controlRef.current && onControl && globalGroup) {
+			if (
+				isControlRef.current &&
+				controlRef.current &&
+				onControl &&
+				globalGroup
+			) {
 				const { position, rotation } = controlRef.current.object;
 				const { position: gpos, rotation: grot } = globalGroup;
 				onControl({
@@ -85,7 +99,7 @@ export default function Earth({ data, onControl, positions }: EarthProps) {
 				});
 			}
 		}, 100),
-		[onControl]
+		[]
 	);
 
 	return (
@@ -104,6 +118,8 @@ export default function Earth({ data, onControl, positions }: EarthProps) {
 					onEnd={endHandler}
 					onChange={changeHandler}
 					ref={controlRef}
+					minDistance={200}
+					maxDistance={2000}
 				/>
 				<Global data={data} gref={groupRef} />
 			</Canvas>

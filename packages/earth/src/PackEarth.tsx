@@ -8,13 +8,29 @@ export default CreatePack(Earth, {
 		data: {
 			name: "数据",
 			type: "array",
-			description: "{ lat: string, lng: string, value: number }[]",
+			description: "Array<{ lat: string, lng: string, value: number }>",
 			default: defaultData,
 		},
+		positions: {
+			name:"位置",
+			type:"object",
+			description: `
+{
+	// 摄像机位置
+	cp:{x:number, y:number, z:number},
+	// 摄像机角度
+	cr:{x:number, y:number, z:number},
+	// 地球位置
+	gp:{x:number, y:number, z:number},
+	// 地球角度
+	gr:{x:number, y:number, z:number},
+}
+	`,
+		}
 	},
 	events: {
 		onControl: {
-			description: `({cp, cr, gp, gr})=>void \n cp，cr摄像机的位置和角度，gp，gr地球的位置和角度`,
+			description: `({cp, cr, gp, gr})=>void`,
 		},
 	},
 });
